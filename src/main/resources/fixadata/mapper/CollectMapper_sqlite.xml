@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fixadata.collect.mapper.CollectMapper">
+
+	<insert id="insertTestData" parameterType="java.util.List">
+		insert into testdb(f1,f2,f3,f4,f5,f6,f7,f8) values
+		<foreach collection="list" item="element" index="index"  separator=","  >
+		(#{element.f1}, #{element.f2}, #{element.f3}, #{element.f4}, #{element.f5}, #{element.f6}, #{element.f7}, #{element.f8})
+		</foreach>
+	</insert>
+	<insert id="insertTestData2" parameterType="hashMap">
+		insert into testdb(f1,f2,f3,f4,f5,f6,f7,f8) VALUES
+		
+		(#{f1}, #{f2}, #{f3}, #{f4}, #{f5}, #{f6}, #{f7}, #{f8})
+		
+	</insert>
+	<insert id="insertBaseData" parameterType="fixadata.collect.vo.baseDataVO">
+			INSERT INTO BASE_DATA(
+			BASE_DATA_SN
+			,DATA_NAME
+			,DATA
+			,HEADER
+			,FLAG
+			) VALUES (
+			(SELECT IFNULL(MAX(BASE_DATA_SN)+1 ,1)FROM BASE_DATA)
+			, #{data_name}
+			, #{data}
+			, #{header}
+			, #{flag}
+			)
+	</insert>
+	<update id="standardInsert" parameterType="fixadata.collect.vo.baseDataVO">
+			UPDATE BASE_DATA SET
+			STRD_HEADER = #{strd_header}
+			,USE_YN = #{use_yn}
+			WHERE FLAG = #{flag}
+	</update>
+	
+	<update id="updateBaseData" parameterType="fixadata.collect.vo.baseDataVO">
+			UPDATE BASE_DATA SET
+			DATA =  #{data}
+			,DATA_NAME = #{data_name}
+			,HEADER = #{header}
+			WHERE FLAG =  #{flag}
+	</update>
+	<select id="selectChkBaseData" resultType="int">
+			SELECT 
+				COUNT(*)
+			FROM BASE_DATA 
+			WHERE FLAG =  #{flag}
+	</select>
+	
+	<select id="selectTestDb" resultType="java.util.LinkedHashMap">
+		select 
+			idx
+			, f1
+			, f2
+			, f3
+			, f4
+			, f5
+			, f6
+			, f7
+			, f8
+		from testdb
+	</select>
+
+	<select id="selectjson" resultType="java.util.LinkedHashMap">
+		select idx, jsonstring  from json order by idx desc limit 1
+	</select>
+	
+	<insert id="insertjson" parameterType="hashMap">
+		insert into json(
+			jsonstring
+		)values
+		(
+			#{jsonstring}
+		)
+		
+	</insert>
+	
+	
+	<!-- 실개발용 -->
+	
+	<!-- 데이터베이스 정보 입력 -->
+	<insert id="insertDbInfo" parameterType="fixadata.collect.vo.dbInfoVO" useGeneratedKeys="true" keyProperty="id">
+		insert into dbinfo(
+			driver
+			, url
+			, id
+			, pw
+			, member_sn
+			, insert_dt
+			
+		)
+		values
+		(
+			#{driver}
+			, #{url}
+			, #{id}
+			, #{pw}
+			, #{member_sn}
+			, datetime('now','localtime')
+		) 
+	
+		
+	</insert>
+	
+	<!--  -->
+	<select id="selectDbList" 
+			parameterType="fixadata.collect.vo.dbInfoVO"
+			resultType="fixadata.collect.vo.dbInfoVO"
+			>
+			select * from dbinfo where member_sn = #{member_sn}	
+	
+	</select>
+	
+	<!-- selectDbInfoBySn -->
+	<select id="selectDbInfoBySn"
+			parameterType="fixadata.collect.vo.dbInfoVO"
+			resultType="fixadata.collect.vo.dbInfoVO">
+			select * from dbinfo where db_sn = #{db_sn}
+	</select>
+	
+	 
+	<update id="updateDbInfo" parameterType="fixadata.collect.vo.dbInfoVO">
+		
+	</update>
+	
+	
+	<!--project 정보 등록 -->
+	<insert id="insertTbProject" parameterType="fixadata.collect.vo.tbProjectVO" useGeneratedKeys="true" keyProperty="project_sn">
+		insert into project(
+			  member_sn
+			, project_name
+			, flag
+			, insert_dt
+			
+		)
+		values
+		(
+			  #{member_sn}
+			, #{project_name}
+			, #{flag}
+			, datetime('now','localtime')
+		) 
+	</insert>
+	
+	<!--project_DATA 정보 등록 -->
+	<insert id="insertTbProjectData" parameterType="fixadata.collect.vo.tbProjectDataVO" useGeneratedKeys="true" keyProperty="project_data_sn">
+		insert into project_data(
+			  project_sn
+			, data
+			, header
+			, data_version
+			, insert_dt
+			, step
+			, collect_info
+			, header_option
+			, diagram_layout
+			, blockchain
+		)
+		values
+		(
+			  #{project_sn}
+			, #{data}
+			, #{header}
+			, (
+				select ifnull(max(data_version)+1 ,0)
+			    	from project_data 
+			   	where project_sn = #{project_sn}
+			   )
+			, datetime('now','localtime')
+			, #{step}
+			, #{collect_info}
+			, #{header_option}
+			, #{diagram_layout}
+			, #{blockchain}
+		) 
+	</insert>
+	
+	<update id="updateTbProjectData"  parameterType="fixadata.collect.vo.tbProjectDataVO" >
+		update project_data set
+			 diagram_layout =  #{diagram_layout}
+				, header = #{header}
+				, data = #{data}
+			 ,header_option = #{header_option}
+			 ,blockchain = #{blockchain}
+			 
+		where project_sn = #{project_sn}
+		and project_data_sn = #{project_data_sn}
+	</update>
+	
+	<update id="diagramUpdateTbProjectData"  parameterType="fixadata.collect.vo.tbProjectDataVO" >
+		update project_data set
+			 diagram_layout =  #{diagram_layout}
+			 ,blockchain = #{blockchain}
+		where project_sn = #{project_sn}
+		and project_data_sn = #{project_data_sn}
+	</update>
+	
+	
+	<!-- 프로젝트 리스트 로드 -->
+	<select id="selectProjectList"
+			parameterType="fixadata.collect.vo.tbProjectVO"
+			resultType="fixadata.collect.vo.tbProjectVO">
+			
+		select * from project 
+			where	
+				
+				1=1 
+				<if test='member_sn != null and member_sn > -1'>
+					and
+						member_sn = #{member_sn}
+				</if>
+				<if test='flag != null and flag > -1'>
+					and
+						flag = #{flag}
+			    </if>
+			    
+			    <if test='project_sn != null and project_sn > -1'>
+					and
+						project_sn = #{project_sn}
+			    </if>
+				
+	</select>
+	
+	<select id="selectProjectDataInfo"
+			parameterType="fixadata.collect.vo.tbProjectDataVO"
+			resultType="fixadata.collect.vo.tbProjectDataVO">
+			
+		select * from project_data 
+			where	
+				
+				1=1 
+				<if test='project_data_sn != null and project_data_sn > -1'>
+					and
+						project_data_sn = #{project_data_sn}
+				</if>
+			    <if test='project_sn != null and project_sn > -1'>
+					and
+						project_sn = #{project_sn}
+			    </if>
+    </select>
+    
+	<select id="selectProjectDataInfoCnt"
+			parameterType="fixadata.collect.vo.tbProjectDataVO"
+			resultType="int">
+			
+		select count(diagram_layout) from project_data 
+			where	
+				
+				1=1 
+				<if test='project_data_sn != null and project_data_sn > -1'>
+					and
+						project_data_sn = #{project_data_sn}
+				</if>
+			    <if test='project_sn != null and project_sn > -1'>
+					and
+						project_sn = #{project_sn}
+			    </if>
+	</select>
+	
+	<!-- 프로젝트 데이터 리스트 로드 -->
+	<select id="selectProjectDataVersionList"
+			parameterType="fixadata.collect.vo.tbProjectDataVO"
+			resultType="fixadata.collect.vo.tbProjectDataVO"
+	>
+		select 
+			b. project_data_sn
+			, b.project_sn
+			, b.data_version
+			, b.step
+			, b.insert_dt
+		from project a, project_data b
+		where		
+			a.project_sn = b.project_sn
+		and	
+			a.member_sn = #{member_sn}
+		<if test='project_sn != null and project_sn > -1'>
+		and	
+			a.project_sn=#{project_sn}
+		</if>
+		<if test='project_data_sn != null and project_data_sn > 0'>
+			and
+				b.project_data_sn = #{project_data_sn}
+	    </if>
+		
+		<if test='data_version != null and data_version > -1'>
+			and
+				b.data_version = #{data_version}
+	    </if>
+			order by b.data_version desc 
+	
+	</select>	
+	
+	<!--임시 프로젝트 및 데이터 삭제 (project table data delete) -->
+	<delete id="deleteProject" parameterType="fixadata.collect.vo.tbProjectDataVO" >
+	
+		DELETE FROM PROJECT 
+		 WHERE DATETIME(INSERT_DT,'+'||#{insert_dt}||' DAYS')<![CDATA[ <  ]]> DATETIME('NOW', 'LOCALTIME')
+		   AND FLAG = 0
+		   
+	</delete>
+	
+	<!--임시 프로젝트 및 데이터 삭제 (projectData table data delete) -->
+	<delete id="deleteProjectData" parameterType="fixadata.collect.vo.tbProjectDataVO">
+		
+		DELETE FROM PROJECT_DATA 
+		 WHERE PROJECT_SN IN ( SELECT PROJECT_SN  
+		                         FROM PROJECT 
+								WHERE DATETIME(INSERT_DT,'+'||#{insert_dt}||' DAYS')<![CDATA[ <  ]]> DATETIME('NOW', 'LOCALTIME')
+		                          AND FLAG = 0 )
+	
+	</delete>
+	
+	
+    <!-- 샘플 리스트 로드 -->
+	<select id="selectSampleList" parameterType="fixadata.collect.vo.baseDataVO" resultType="fixadata.collect.vo.baseDataVO">
+		SELECT 
+			*
+		FROM base_data 
+		WHERE 1=1 
+		 <if test='base_data_sn != null and base_data_sn > 0'>
+		   AND base_data_sn = #{base_data_sn}
+		 </if>
+		 and flag=3
+				
+	</select>
+    <!-- 샘플 리스트 로드 -->
+	<select id="selectStandardList" parameterType="fixadata.collect.vo.baseDataVO" resultType="fixadata.collect.vo.baseDataVO">
+			
+		SELECT * 
+		  FROM base_data 
+		 WHERE 1=1 
+		AND flag = #{flag}
+				
+	</select>
+	<select id="selectCordDomainList" parameterType="fixadata.collect.vo.baseDataVO" resultType="fixadata.collect.vo.baseDataVO">
+			
+		SELECT * 
+		  FROM base_data 
+		 WHERE 1=1 
+		AND flag = #{flag}
+				
+	</select>
+	
+   <select id="selectProjectDataListCnt" parameterType="fixadata.collect.vo.tbProjectVO" resultType="int">
+		SELECT 
+			  COUNT(*)
+		FROM  PROJECT
+		WHERE PROJECT_SN = #{project_sn}
+	</select>	
+	
+	 <select id="selectProjectDataSn" parameterType="fixadata.collect.vo.tbProjectDataVO" resultType="int">
+	SELECT 
+			  IFNULL(MAX(PROJECT_DATA_SN)+1,0)
+		FROM  PROJECT_DATA 
+		WHERE PROJECT_SN = #{project_sn}
+	</select>	
+	 <select id="selectMaxProjectSn" resultType="int">
+		SELECT MAX(PROJECT_SN)
+		FROM  PROJECT
+	</select>	
+	 <select id="selectMaxProjectDataSn"  resultType="int">
+		SELECT  IFNULL(MAX(PROJECT_DATA_SN)+1,0)
+		FROM  PROJECT_DATA
+	</select>	
+	<select id="selectProjectSn" resultType="String">
+		SELECT 
+			  IFNULL(MAX(PROJECT_SN)+1,1)
+		FROM  PROJECT 
+	</select>	
+	
+	<!-- 스케줄링 스케줄러 관리 화면 -->
+	<select id="selectScheduleProject" parameterType="fixadata.collect.vo.scheduleVO" resultType="fixadata.collect.vo.scheduleVO">
+		SELECT 
+			a.*
+			, (
+					select 
+						group_concat(schedule_data_sn ||"/"|| insert_dt) 
+					from 
+						schedule_data  
+					where 
+						schedule_sn = a.schedule_sn
+				) as dataList
+		FROM schedule as a
+		order by schedule_sn desc 
+	</select>
+	<select id="selectScheduleDetail" parameterType="fixadata.collect.vo.scheduleVO" resultType="fixadata.collect.vo.scheduleVO">
+	
+	select * from schedule
+	where
+		1=1
+	and
+		schedule_sn = #{schedule_sn}	
+		
+	</select>
+	<select id="selectScheduleData" parameterType="fixadata.collect.vo.scheduleDataVO" resultType="fixadata.collect.vo.scheduleDataVO">
+		SELECT 
+			*
+		FROM schedule_data where schedule_sn = #{schedule_sn}
+	</select>
+	<!-- 스케줄링 추가 -->
+	<insert id="insertScheduleProject" parameterType="fixadata.collect.vo.scheduleVO" useGeneratedKeys="true" >
+		INSERT INTO schedule(
+					schedule_sn
+					,member_sn
+					,schedule_title
+					,schedule_url
+					,schedule_path
+					,schedule_type
+					,schedule_term_type
+					,schedule_term
+					,schedule_after 
+					,insert_dt
+				)
+		VALUES ((SELECT ifnull(MAX(schedule_sn),0)+1 FROM schedule) 
+					,#{member_sn}
+					,#{schedule_title}
+					,#{schedule_url}
+					,#{schedule_path}
+					,#{schedule_type}
+					,#{schedule_term_type}
+					,#{schedule_term}
+					,#{schedule_after}
+					,datetime('now','localtime')
+				)
+	</insert>
+	
+	<update id="updateScheduleActive" parameterType="fixadata.collect.vo.scheduleVO" >
+		update schedule set 
+		schedule_active = #{schedule_active}
+		where
+			1=1
+		<if test='schedule_sn != null and schedule_sn > 0'>
+					and
+						schedule_sn = #{schedule_sn}
+		</if>
+	</update>
+	
+	
+	<select id="selectScheduleDataByScheduSn" parameterType="fixadata.collect.vo.scheduleDataVO" resultType="fixadata.collect.vo.scheduleDataVO">
+		
+		select * from
+			schedule_data 
+		where 
+			schedule_data_sn = #{schedule_data_sn} 
+	
+	</select>
+	<select id="checkScheduleProject" parameterType="fixadata.collect.vo.scheduleVO" resultType="int">
+		
+		select count(*) from
+			schedule 
+		where 
+			schedule_sn = #{schedule_sn} 
+	
+	</select>
+	<select id="selectActiveProcess"  resultType="fixadata.collect.vo.scheduleVO">
+		
+		select *  from
+			schedule 
+		where 
+			schedule_active = '1'
+	
+	</select>
+		<select id="selectActiveProcessCnt"  resultType="int">
+		
+		select count(*)  from
+			schedule 
+		where 
+			schedule_active = '1'
+	
+	</select>
+	<insert id="insertScheduleData" parameterType="fixadata.collect.vo.scheduleDataVO" >
+		INSERT INTO schedule_data(
+					schedule_sn
+					,schedule_data_sn
+					,header
+					,header_option
+					,data
+					,word_info
+					,insert_dt
+				)
+		VALUES (
+					#{schedule_sn}
+					,(SELECT ifnull(MAX(schedule_data_sn),0)+1 FROM schedule_data) 
+					,#{header}
+					,#{header_option}
+					,#{data}
+					,#{word_info}
+					,datetime('now','localtime')
+				)
+	</insert>
+	
+	<update id="initScheduleActive">
+		update schedule set 
+		schedule_active = '0'
+	</update>
+	<delete id="deleteScheduleList" >
+		delete from schedule
+		where schedule_sn=#{schedule_sn}
+	</delete>
+</mapper>

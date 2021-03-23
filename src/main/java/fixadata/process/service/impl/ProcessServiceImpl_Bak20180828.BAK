@@ -1,0 +1,954 @@
+package fixadata.process.service.impl;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
+
+//import org.rosuda.JRI.REXP;
+//import org.rosuda.JRI.Rengine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
+import fixadata.process.mapper.ProcessMapper;
+import fixadata.process.service.ProcessService;
+import fixadata.rule.mapper.RuleMapper;
+import fixadata.util.UtilExcel;
+import fixadata.util.UtilJson;
+import fixadata.util.UtilSession;
+
+
+
+@Service("processService")
+public class ProcessServiceImpl_Bak20180828 extends EgovAbstractServiceImpl implements ProcessService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessServiceImpl_Bak20180828.class);
+
+
+	@Resource(name="processMapper")
+	private ProcessMapper processDAO;
+
+	@Resource(name="ruleMapper")
+	private RuleMapper ruleDAO;
+	
+	private   String      ruleTmpSql   = "";     // 룰 단건처리  임시용 
+	private   String      filterTmpSql = "";     // 필터 단건처리 임시용 
+
+	private   String      ruleAllTmpSql   = "";     // 룰 전처리  임시용 
+	private   String      filterAllTmpSql = "";     // 필터 전처리 임시용 
+	private   List        resultTmpList	= new ArrayList<>();
+
+	/* 프로젝트 데이터 컬럼 목록 */
+	@Override
+	public List selectTempColumnList(Object map) throws Exception {
+		return processDAO.selectTempColumnList(map);
+	}
+
+
+	/* 프로젝트 목록 */
+	@Override
+	public List selectProjectList(Object map) throws Exception {
+		return processDAO.selectProjectList(map);
+	}
+
+
+	/* 프로젝트 데이터 목록 */
+	@Override
+	public Map<String ,Object> tempDataList( Map<String ,Object> map ) throws Exception {
+
+		Map<String ,Object> result	= new HashMap<String, Object>();
+
+		String SESSION_PROJECT_SN			= "";
+		String SESSION_PROJECT_NAME			= "";
+		String SESSION_TABLE_NAME			= "";
+		String SESSION_FILE_NAME			= "";
+		String SESSION_TABLE_HEADER			= "";
+		String SESSION_TABLE_HEADER_KEY		= "";
+		String SESSION_TABLE_HEADER_COUNT	= "";
+
+		String exlHeaderCount	= "";
+		String exlHeaderKey		= "";
+		String exlHeaderName	= "";
+		List<?> listData;
+		String WORK_FLOW_DATA	= "";
+
+		if ( UtilSession.getAttribute("SESSION_FILE_NAME") != null ) {
+			SESSION_FILE_NAME = UtilSession.getAttribute("SESSION_FILE_NAME").toString();
+		}
+
+		if ( SESSION_FILE_NAME.equals("") ) {		// ## if ## 프로젝트 열기 시
+			String prjct_sn = ( UtilSession.getAttribute("SESSION_PROJECT_SN") == null ) ? "0" : UtilSession.getAttribute("SESSION_PROJECT_SN").toString();
+			map.put( "PRJCT_SN" ,prjct_sn );
+			List listProject	= processDAO.selectProjectList(map);		// 프로젝트 목록
+			map = (Map)listProject.get(0);
+
+			exlHeaderCount		= Integer.toString( map.get("TEMP_TABLE_HEADER_KEY").toString().split(",").length);
+			exlHeaderKey		= map.get("TEMP_TABLE_HEADER_KEY").toString();
+			exlHeaderName		= map.get("TEMP_TABLE_HEADER").toString().replaceAll("\\n", "");
+
+			listData			= processDAO.selectTempDataList(map);		// 프로젝트 데이터 목록
+
+			// 프로젝트 오픈상테 세션 값 설정
+			SESSION_PROJECT_SN			= map.get("PRJCT_SN").toString();
+			SESSION_PROJECT_NAME		= map.get("PRJCT_NM").toString();
+			SESSION_TABLE_NAME			= map.get("TEMP_TABLE_NM").toString();
+			SESSION_FILE_NAME			= "";
+			SESSION_TABLE_HEADER		= exlHeaderName;
+			SESSION_TABLE_HEADER_KEY	= exlHeaderKey;
+			SESSION_TABLE_HEADER_COUNT	= exlHeaderCount;
+			
+			// ##### 작업해야함 ##### 워크플로우 JSON을 조회하여 담아야함
+			WORK_FLOW_DATA				= "";
+
+		} else {															// ## if ## 파일첨부 시
+
+			String fileName					= UtilSession.getAttribute("SESSION_FILE_NAME").toString();
+
+			File desti						= new File("database");
+			UtilExcel exl					= new UtilExcel();
+			exl.setInputFile(desti.getAbsolutePath() +"\\"+ fileName);
+			map								= exl.read();
+
+			Map<String ,Object> mapHeader	= (Map<String ,Object>) map.get("header");
+			exlHeaderCount					= ( Integer.toString((Integer.parseInt(map.get("columnCnt").toString()) + 1)) );
+
+			int fx							= 0;
+			for ( String mapkey:mapHeader.keySet() ) {
+				exlHeaderKey	+= mapkey.toString();
+				exlHeaderName	+= mapHeader.get(mapkey).toString();
+				++fx;
+				if ( fx < mapHeader.keySet().size() ) {
+					exlHeaderKey	+= ",";
+					exlHeaderName	+= ",";
+				}
+			};
+			listData = UtilJson.getJsonArrayFromList((List) map.get("dataList"));
+
+			// 프로젝트 오픈상테 세션 값 설정
+			SESSION_PROJECT_SN			= "";
+			SESSION_PROJECT_NAME		= "";
+			SESSION_TABLE_NAME			= "";
+			SESSION_FILE_NAME			= fileName;
+			SESSION_TABLE_HEADER		= exlHeaderName;
+			SESSION_TABLE_HEADER_KEY	= exlHeaderKey;
+			SESSION_TABLE_HEADER_COUNT	= exlHeaderCount;
+			WORK_FLOW_DATA				= "";
+		}
+
+		// Session Setting ( fixadata.util.UtilCommon.projectSession )
+		Map<String ,Object> mapSession = new HashMap<String ,Object>();
+		mapSession.put( "SESSION_PROJECT_SN"			,SESSION_PROJECT_SN			);
+		mapSession.put( "SESSION_PROJECT_NAME"			,SESSION_PROJECT_NAME		);
+		mapSession.put( "SESSION_TABLE_NAME"			,SESSION_TABLE_NAME			);
+		mapSession.put( "SESSION_FILE_NAME"				,SESSION_FILE_NAME			);
+		mapSession.put( "SESSION_TABLE_HEADER"			,SESSION_TABLE_HEADER		);
+		mapSession.put( "SESSION_TABLE_HEADER_KEY"		,SESSION_TABLE_HEADER_KEY	);
+		mapSession.put( "SESSION_TABLE_HEADER_COUNT"	,SESSION_TABLE_HEADER_COUNT	);
+		UtilSession.setProjectSession(mapSession);
+
+		// response
+		result.put( "PROJECT_SN"			,SESSION_PROJECT_SN			);
+		result.put( "TABLE_NAME"			,SESSION_TABLE_NAME			);
+		result.put( "PROJECT_NAME"			,SESSION_PROJECT_NAME		);
+		result.put( "FILE_NAME"				,SESSION_FILE_NAME			);
+		result.put( "TABLE_HEADER"			,SESSION_TABLE_HEADER		);
+		result.put( "TABLE_HEADER_KEY"		,SESSION_TABLE_HEADER_KEY	);
+		result.put( "TABLE_HEADER_COUNT"	,SESSION_TABLE_HEADER_COUNT	);
+		result.put( "listData"				,listData					);
+		result.put( "WORK_FLOW_DATA"		,WORK_FLOW_DATA				);
+
+		return result;
+	}
+
+
+	/* 프로젝트 정보 저장 */
+	@Override
+	public String insertPrjInfo( Map map ) throws Exception {
+
+		String SESSION_PROJECT_SN = "";
+		if ( UtilSession.getAttribute("SESSION_PROJECT_SN") != null ) {
+			SESSION_PROJECT_SN = UtilSession.getAttribute("SESSION_PROJECT_SN").toString();
+		}
+		if( SESSION_PROJECT_SN.equals("") ) {
+
+			map.put( "REAL_FILE_NM"				,UtilSession.getAttribute("SESSION_FILE_NAME")			);
+			map.put( "TEMP_TABLE_HEADER"		,UtilSession.getAttribute("SESSION_TABLE_HEADER")		);
+			map.put( "TEMP_TABLE_HEADER_KEY"	,UtilSession.getAttribute("SESSION_TABLE_HEADER_KEY")	);
+			
+			int i = processDAO.insertPrjInfo(map);
+
+			map.put( "TEMP_TABLE_NM" ,"TEMP_TABLE" + map.get("PRJCT_SN").toString() );
+			createTempTable(map);
+
+			List listProject	= processDAO.selectProjectList(map);		// 프로젝트 목록
+			Map<String ,Object> mapProject = (Map) listProject.get(0);
+			Map<String ,Object> mapSession = new HashMap<String ,Object>();
+
+			// 프로젝트 오픈상테 세션 값 설정
+			mapSession.put( "SESSION_PROJECT_SN"			,mapProject.get("PRJCT_SN")												);
+			mapSession.put( "SESSION_PROJECT_NAME"			,mapProject.get("PRJCT_NM")												);
+			mapSession.put( "SESSION_TABLE_NAME"			,mapProject.get("TEMP_TABLE_NM").toString()								);
+			mapSession.put( "SESSION_FILE_NAME"				,""																		);
+			mapSession.put( "SESSION_TABLE_HEADER"			,mapProject.get("TEMP_TABLE_HEADER").toString()							);
+			mapSession.put( "SESSION_TABLE_HEADER_KEY"		,mapProject.get("TEMP_TABLE_HEADER_KEY").toString()						);
+			mapSession.put( "SESSION_TABLE_HEADER_COUNT"	,mapProject.get("TEMP_TABLE_HEADER_KEY").toString().split(",").length	);
+			UtilSession.setProjectSession(mapSession);
+
+		}
+
+		map.put("TEMP_TABLE" ,UtilSession.getAttribute("SESSION_TABLE_NAME"));
+
+		String result = "false";
+		result = insertTempData(map);
+
+		return result;
+
+	}
+
+	/* 프로젝트 데이터 템프 테이블 생성 */
+	@Override
+	public String createTempTable(Map map) throws Exception {
+
+		int column_cnt	= Integer.parseInt(UtilSession.getAttribute("SESSION_TABLE_HEADER_COUNT").toString());
+
+		String sql		= "CREATE TABLE " + map.get("TEMP_TABLE_NM") + " (HIST_SN INTEGER";
+		for ( int i=0; i<column_cnt; i++ ) {
+			sql += ( ",name" + i + " text" );
+		}
+		sql += ")";
+
+		map.put("SQL", sql);
+
+		processDAO.createTempTable(map);
+		return "true";
+
+	}
+
+
+	/* 프로젝트 데이터 템프테이블 데이터 저장 */
+	@Transactional
+	public String insertTempData( Map map ) throws Exception {
+
+		if ( UtilSession.getAttribute("SESSION_PROJECT_SN") != null ) {
+			String projectSn = (UtilSession.getAttribute("SESSION_PROJECT_SN").toString()).replaceAll(" " ,"");
+			if ( "" != projectSn ) {
+				map = UtilSession.setProjectSessionMap(map);
+			}
+		}
+
+		List<?> columnList	= processDAO.selectTempColumnList(map);
+		String columnString	= "";
+		for( int j=0; j<columnList.size(); j++ ) {
+			Map headerMap = new HashMap();
+			headerMap = (Map)columnList.get(j);
+			columnString += headerMap.get("name").toString();
+			if ( j+1 < columnList.size() ) {
+				columnString += ",";
+			}
+		}
+
+		List list = (List)map.get("DATA_LIST");
+
+		int ms = processDAO.selectHistMaxSn(map);
+
+		for(int i=0;i<list.size();i++){
+			Map dataMap = new HashMap();
+			dataMap = (Map) list.get(i);
+			
+			/*			
+			Collection<String> collectionValues = dataMap.values();
+			String values = ms + ",";
+			for(String s: collectionValues){
+				values  += "\"" + s.replaceAll("\"", "'") + "\"" + ",";
+			}
+			*/
+			String values = ms + ",";
+			String columns = "HIST_SN,";
+			Iterator<String> iter = dataMap.keySet().iterator();
+			while(iter.hasNext()){
+				String keys = (String)iter.next();
+				columns += keys + ",";
+				values	+= ( (dataMap.get(keys) != null && dataMap.get(keys) != "") ? "\"" + dataMap.get(keys).toString().replaceAll("\"", "'") + "\"" + "," : "''," );
+			}
+
+			columns = columns.substring(0, columns.length()-1);
+			values = values.substring(0, values.length()-1);
+			String sql = "INSERT INTO " + map.get("TEMP_TABLE_NM").toString() + "(" + columns + ") VALUES" + " (" + values +")";
+			map.put("SQL", sql);
+			processDAO.insertHistData(map);
+			
+			
+		}
+		Map dataMap = new HashMap();
+		// hist_sn 갯수및 min 값 가져옴 choi
+		dataMap = processDAO.selectHistMinSn(map); 
+
+		int cnt = (int) dataMap.get("CNT");
+
+		// hist_sn 이력 갯수가 5개 이상이면 hist_sn min 값 지움
+		if(cnt>5){
+			map.put("HIST_SN", dataMap.get("HIST_SN"));
+			processDAO.deleteMinHistSn(map); 
+		}
+		return map.get("TEMP_TABLE_NM").toString();
+
+	}
+
+
+	/* 프로젝트 데이터 최신 버전 가져오기 */
+	@Override
+	public int selectHistMaxSn(Object map) throws Exception {
+		return processDAO.selectHistMaxSn(map);
+	}
+
+
+	@Override
+	public List tempHistDataList(Object map) throws Exception {
+		return processDAO.selectTempDataList(map);
+	}
+
+
+	@Override
+	public String deleteTempData(Map map) throws Exception {
+		int i = 0;
+		String result = "";
+		i = processDAO.deleteTempData(map);
+		if(i>0){
+			result = "true";
+		}else{
+			result = "false";
+		}
+		return result;
+	}
+
+	@Override
+	public List<?> sql(Map<String ,Object> param) throws Exception {
+		return processDAO.sql(param);
+	}
+
+	@Override
+	public Map<String ,Object> play(Map<String ,Object> param) throws Exception {
+		Map<String ,Object> result = new HashMap<String ,Object>();
+
+		String palyType = ( param.get("SysType") == null ) ? "output" : param.get("SysType").toString();
+		
+		if ( palyType.equals("rule") ) {
+			result = playRule( param );
+		} else if ( palyType.equals("filter") ) {
+			result = playFilter( param );
+		} else if ( palyType.equals("output") ) {
+			result = playOutput( param );
+		}
+
+		return result;
+	}
+
+	
+	/** R java */
+//	String[] Rargs = { "--vanilla" };
+//	private Rengine re = new Rengine(Rargs, false, null);
+	/* 룰 처리 및 데이터 */
+	@Override
+	public Map<String ,Object> playRule(Map<String ,Object> param) throws Exception {
+//		System.out.println("Rengine created, waiting for R===========================");
+//		REXP x;
+//        System.out.println("Rengine created, waiting for R");
+//		
+//		 
+//        System.out.println(x=re.eval("iris"));
+ 
+//	 	Map<String ,Object> tmp1 = new LinkedHashMap();
+//		Map<String ,Object> tmp2 = new LinkedHashMap();
+//		
+//		tmp1.put("Id", "f7618ff5-510c-4b64-b3d3-770c813c4010");
+//		tmp1.put("Rule", "");
+//		tmp1.put("Type", "00");
+//		tmp1.put("Column", "");
+//		tmp2.put("f7618ff5-510c-4b64-b3d3-770c813c4010", tmp1);
+//		
+//		tmp1 = new LinkedHashMap();
+//		tmp1.put("Id", "7d71d068-4427-4197-aa9d-d567940ce3e4");
+//		tmp1.put("Rule", "3");
+//		tmp1.put("Type", "01");
+//		tmp1.put("Column", "name4,name6");
+//		tmp2.put("7d71d068-4427-4197-aa9d-d567940ce3e4", tmp1);
+//		
+//		tmp1 = new LinkedHashMap();
+//		tmp1.put("Id", "56b4d500-1a39-4091-876f-388cf4d9caa1");
+//		tmp1.put("Rule", "12");
+//		tmp1.put("Type", "02");
+//		tmp1.put("Column", "name4");
+//		tmp2.put("56b4d500-1a39-4091-876f-388cf4d9caa1", tmp1);
+//		tmp1 = new LinkedHashMap();
+//		tmp1.put("Id", "dbff3f6a-7593-46f5-805a-e22895f98b4f");
+//		tmp1.put("Rule", "11");
+//		tmp1.put("Type", "02");
+//		tmp1.put("Column", "name0,name1");
+//		tmp2.put("dbff3f6a-7593-46f5-805a-e22895f98b4f", tmp1);
+//		
+//		tmp1 = new LinkedHashMap();
+//		tmp1.put("Id", "dc8bd7e1-fa2c-47fa-832c-03891981449e");
+//		tmp1.put("Rule", "2");
+//		tmp1.put("Type", "04");
+//		tmp1.put("Column", "");
+//		tmp2.put("dc8bd7e1-fa2c-47fa-832c-03891981449e", tmp1);
+//		
+//		tmp1 = new LinkedHashMap();
+//		tmp1.put("Id", "6d7f14cd-56bd-40d3-97ab-a964583b6d81");
+//		tmp1.put("Rule", "13");
+//		tmp1.put("Type", "02");
+//		tmp1.put("Column", "name5");
+//		tmp2.put("6d7f14cd-56bd-40d3-97ab-a964583b6d81", tmp1);
+//		
+//		tmp1 = new LinkedHashMap();
+//		tmp1.put("Id", "d77a1986-6281-4bc4-a7ec-a7565da33e0d");
+//		tmp1.put("Rule", "2");
+//		tmp1.put("Type", "04");
+//		tmp1.put("Column", "");
+//		tmp2.put("d77a1986-6281-4bc4-a7ec-a7565da33e0d", tmp1);
+		
+//		System.out.println("tmp2========\n"+tmp2);
+ 
+		String key = "dc8bd7e1-fa2c-47fa-832c-03891981449e";
+
+		
+		Map<String ,Object> mapData	= param;
+//		Map<String ,Object> mapData	= tmp2;
+		
+		
+		Map<String ,Object> map		= new HashMap<String ,Object>();
+		Map<String ,Object> ruleMap	= new HashMap<String ,Object>();
+
+		Iterator<String> iter		= mapData.keySet().iterator();
+		
+		
+		List resultList	           = new ArrayList<>(); 
+		Map<String ,Object> result = new HashMap<String ,Object>();
+//		System.out.println("mapData========\n"+mapData);
+		iter		= mapData.keySet().iterator();
+		
+		resultList = new ArrayList<>();
+		
+		String sql       = "";
+		
+		String id = "";
+		String Type = "";
+		String sTmpType = "";
+		map.put("TEMP_TABLE_NM"	,UtilSession.getAttribute("SESSION_TABLE_NAME").toString());     
+		String beId   = "";
+		String beType = "";
+		
+		
+		// 데이터 리스트에 담기
+		while( iter.hasNext() ) {
+			String keys = (String)iter.next();
+			if( mapData.get(keys) != null && mapData.get(keys) != "" ) {
+				map = (Map) mapData.get(keys);
+				Map<String ,Object> tmp3 = new LinkedHashMap();
+				tmp3.put("Id"    , (String) map.get("Id"));
+				tmp3.put("Rule"  , (String) map.get("Rule"));
+				tmp3.put("Type"  , (String) map.get("Type"));
+				tmp3.put("Column", (String) map.get("Column"));
+				resultList.add(tmp3) ;
+				if(keys.equals(key)){
+					sTmpType = (String) map.get("Type");
+				}
+			}  
+		}
+		
+		ruleTmpSql   = "";     
+		filterTmpSql = "";  
+		for(int i=0;i<resultList.size();i++){
+			Map<String ,Object> dataMap = new LinkedHashMap();
+			dataMap = (Map<String, Object>) resultList.get(i);
+			id     = (String) dataMap.get("Id"    );   
+			Type   = (String) dataMap.get("Type"  ); 
+			map.put("TEMP_TABLE_NM"	,UtilSession.getAttribute("SESSION_TABLE_NAME").toString());    
+			if(!Type.equals("00")){
+				
+				
+				
+				
+				if(id.equals(key)){
+					if("01".equals(sTmpType)){  // 룰일 경우 데이터 리스트 반환
+						ruleSqlInfo(dataMap,beId);
+						
+						if(!"".equals(filterTmpSql)){
+							sql = " AND ( "	+filterTmpSql + " ) AND ( "	+	ruleTmpSql	+" )";
+						} else {
+							sql = " AND ( "	+	ruleTmpSql	+" )";
+						}
+						 
+						map.put("sql", sql);
+						List<?> dataList	= processDAO.selectTempDataList(map);
+						
+						result.put("data", dataList);
+					} else if("02".equals(sTmpType)){ // 필터 일 경우 데이터 리스트 반환
+						filterSqlInfo(dataMap,beId);
+						if(!"".equals(filterTmpSql)){
+							sql = " AND ( "	+filterTmpSql + " ) ";
+						}
+						map.put("sql", sql);
+						List<?> dataList	= processDAO.selectTempDataList(map);
+						result.put("data", dataList);
+					} else if("04".equals(sTmpType)){ // d3 인경우 카운터 반환 이전 키값으로 sql 찾기
+						ruleTmpSql   = "";     
+						filterTmpSql = "";  
+						
+						for(int j=0;j<resultList.size();j++){
+							Map<String ,Object> dataMap2 = new LinkedHashMap();
+							dataMap2 = (Map<String, Object>) resultList.get(j);
+							id     = (String) dataMap2.get("Id"    );   
+							Type   = (String) dataMap2.get("Type"  ); 
+							 
+							if(id.equals(beId)){
+								if(Type.equals("01")){
+//									result	= ruleCntSqlInfo(dataMap2);
+									result.put("data", ruleCntSqlInfo(dataMap2));
+								} else if(Type.equals("02")){
+//									result	= filterCntSqlInfo(dataMap2);
+									result.put("data", filterCntSqlInfo(dataMap2));
+								}
+								break;
+							} else {
+								if(Type.equals("01")){
+									ruleSqlInfo(dataMap,beId);
+									ruleTmpSql   = "";     
+									filterTmpSql = "";  
+								} else if(Type.equals("02")){
+									filterSqlInfo(dataMap2,beId);
+								}  
+							} 
+						}
+					}
+					break;
+				} else {
+					if(Type.equals("01")){
+						ruleSqlInfo(dataMap,beId);
+						ruleTmpSql   = "";     
+						filterTmpSql = "";  
+					} else if(Type.equals("02")){
+						filterSqlInfo(dataMap,beId);
+					}  
+				}
+				
+				
+				
+				
+				
+			}
+			
+			beId = id;
+			beType = Type;
+		}
+//		System.out.println("result========"+result);
+		return result;
+	}
+
+	/* 필터 처리 및 데이터 */
+	@Override
+	public Map<String ,Object> playFilter(Map<String ,Object> param) throws Exception {
+		Map<String ,Object> result = new HashMap<String ,Object>();
+		return result;
+	}
+
+	/* 전체 처리 및 데이터 */
+	@Override
+	public Map<String ,Object> playOutput(Map<String ,Object> param) throws Exception {
+
+		Map<String ,Object> mapData	    = param;
+		Map<String ,Object> map		    = new HashMap<String ,Object>();
+		Map<String ,Object> ruleDataMap	= new HashMap<String ,Object>();
+
+		Iterator<String> iter		= mapData.keySet().iterator();
+		
+		String      sType      = ""; // 현재타입 
+		String      sqlEnd     = ""; // 최종 sql
+		String      sql        = "";
+		
+		Map<String ,Object> result = new LinkedHashMap();
+		
+//		System.out.println("mapData===\n"+mapData);
+		sqlEnd  = "";
+		iter	= mapData.keySet().iterator();
+ 
+		ruleAllTmpSql   = "";
+		filterAllTmpSql = "";
+		List resultList	= new ArrayList<>();
+		resultTmpList	= new ArrayList<>();
+		while( iter.hasNext() ) {
+			String keys = (String)iter.next();
+			
+			if( mapData.get(keys) != null && mapData.get(keys) != "" ) {
+				map = (Map) mapData.get(keys);
+//				map.put("TEMP_TABLE_NM"	,UtilSession.getAttribute("SESSION_TABLE_NAME").toString());     
+				sType = (String) map.get("Type"); 
+				if(sType.equals("01")){
+			        
+					ruleDataMap = ruleAllSqlInfo(map);
+					if(!"".equals(filterAllTmpSql)){
+						if(!"".equals(sqlEnd)){
+							if(!"".equals(ruleAllTmpSql)){
+								sqlEnd += " OR (( " + filterAllTmpSql+") " + " AND (" + ruleAllTmpSql +"))";
+							} else {
+								sqlEnd += " OR ( " + filterAllTmpSql+") " ;
+							}
+						} else {
+							if(!"".equals(ruleAllTmpSql)){
+								sqlEnd += " AND (( " + filterAllTmpSql+") " + " AND (" + ruleAllTmpSql +"))";
+							} else {
+								sqlEnd += " AND ( " + filterAllTmpSql+") " ;
+							}
+						}
+					} else {
+						if(!"".equals(sqlEnd)){
+							if(!"".equals(ruleAllTmpSql)){
+								sqlEnd += " OR (  " + ruleAllTmpSql +") ";
+							}  
+						} else {
+							if(!"".equals(ruleAllTmpSql)){
+								sqlEnd += " AND (  " + ruleAllTmpSql +") ";
+							}  
+						}
+					}
+					ruleAllTmpSql   = "";
+					filterAllTmpSql = "";
+					resultList.add(ruleDataMap);
+				} else if(sType.equals("02")){
+					filterAllSqlInfo(map);
+				}   
+			}
+		}
+		 
+		if(!"".equals(filterAllTmpSql)){
+			if(!"".equals(sqlEnd)){
+				sqlEnd += " OR ( " + filterAllTmpSql+") " ;
+			} else {
+				sqlEnd += " AND ( " + filterAllTmpSql+") " ;
+			}
+		}  
+		result.put("data", resultList);
+//		System.out.println("result==========\n"+result);
+//		System.out.println("resultList==========\n"+resultList);
+//		System.out.println("sqlEnd=========="+sqlEnd);
+ 
+		map.put("sql"			,sqlEnd); 
+		// 이상치 검출 결과 전체 조회 choi
+		List<?> listData = processDAO.selectTempDataList(map);		
+
+		// 결과치 저장 choi
+		if(listData.size()>0){
+			int iHistMaxSn = processDAO.selectHistMaxSn(map);	
+			// 이상치 결과 데이터 저장 choi
+			for(int i=0 ; i< listData.size() ; i++){
+				Map dataMap = new HashMap();
+				dataMap = (Map)listData.get(i);
+				
+				String values = iHistMaxSn + ",";
+				String columns = "HIST_SN,";
+				iter = dataMap.keySet().iterator();
+				while(iter.hasNext()){
+					String keys = (String)iter.next();
+					columns += keys + ",";
+					values	+= ( (dataMap.get(keys) != null && dataMap.get(keys) != "") ? "\"" + dataMap.get(keys).toString().replaceAll("\"", "'") + "\"" + "," : "''," );
+				}
+
+				columns = columns.substring(0, columns.length()-1);
+				values = values.substring(0, values.length()-1);
+				sql = "INSERT INTO " + map.get("TEMP_TABLE_NM").toString() + "(" + columns + ") VALUES" + " (" + values +")";
+				map.put("SQL", sql); 
+				// 이상치 결과값 저장 choi
+				processDAO.insertHistData(map);
+			}
+		}
+		// 결과치 저장 choi end
+		
+		// hist_sn 갯수및 min 값 가져옴 choi
+		Map dataMap = processDAO.selectHistMinSn(map); 
+
+		int cnt = (int) dataMap.get("CNT");
+
+		// hist_sn 이력 갯수가 5개 이상이면 hist_sn min 값 지움
+		if(cnt>5){
+			map.put("HIST_SN", dataMap.get("HIST_SN"));
+			processDAO.deleteMinHistSn(map); 
+		} 
+		 
+		
+		return result;
+	}
+	 
+	
+
+	/* 룰 관련 sql 만들기 */
+	@Override
+	public void ruleSqlInfo(Map<String ,Object> map,String beId) throws Exception {
+		//eturn null;
+		String[]	var;
+		String sql = "";
+		
+		var = map.get("Column").toString().split(",");
+		 
+		map.put("RULE_SN" ,map.get("Rule"));
+		List<?> ruleTmp		= ruleDAO.list(map);
+		Map<String ,Object> ruleMap				= (Map<String ,Object>) ruleTmp.get(0);
+		
+		int before = 0;
+		List resultList = new ArrayList<>();
+		
+		
+		for(int j=0;j<var.length;j++){
+			if(ruleTmpSql.equals("")){
+				ruleTmpSql += "  " + var[j] +" "+ ruleMap.get("RULE_CONT").toString()+ " " ;  
+			} else {
+				ruleTmpSql += " OR " + var[j] +" "+ ruleMap.get("RULE_CONT").toString()+ " " ;  
+			}
+		}
+	}
+	
+	
+	/* 필터 관련 sql 만들기 */
+	@Override
+	public void filterSqlInfo(Map<String ,Object> map,String beId) throws Exception {
+		String[] var;
+		String sql = "";
+		var = map.get("Column").toString().split(",");
+		 
+		map.put("RULE_SN" ,map.get("Rule"));
+		List<?> ruleTmp		= ruleDAO.list(map);
+		Map<String ,Object> ruleMap				= (Map<String ,Object>) ruleTmp.get(0);
+		for( int fx=0; fx<var.length; ++fx ) {
+			if("".equals(filterTmpSql)){                                                                                                          
+				filterTmpSql =  " "     +  var[fx]+ " " + ruleMap.get("RULE_CONT").toString()  + " " ;                                                
+			} else {                                                                                                                            
+				filterTmpSql += " AND  "+  var[fx]+ " " + ruleMap.get("RULE_CONT").toString()  + " " ;                                           
+			}                                                                                                                                   
+		}
+	}
+	 
+	
+	/* d3 관련 rule sql 만들기 */
+	@Override
+	public Map<String ,Object> ruleCntSqlInfo(Map<String ,Object> dataMap2)throws Exception {
+		Map<String ,Object> result = new HashMap<String ,Object>();
+		
+		String[] sessionName = UtilSession.getAttribute("SESSION_TABLE_HEADER").toString().split(",");
+		String[] sessionKey	 = UtilSession.getAttribute("SESSION_TABLE_HEADER_KEY").toString().split(",");
+
+		String		ruleSn   = dataMap2.get("Rule").toString();
+		String[]	column   = dataMap2.get("Column").toString().split(",");
+		
+ 
+
+		dataMap2.put( "RULE_SN"		    ,ruleSn											);
+		dataMap2.put( "TEMP_TABLE_NM"	,UtilSession.getAttribute("SESSION_TABLE_NAME")	);
+		
+		List<?>             ruleTmp		= ruleDAO.list(dataMap2);
+		Map<String ,Object> ruleMap		= (Map<String ,Object>) ruleTmp.get(0);
+		
+		List<?> dataList = processDAO.selectTempDataList(dataMap2);
+		Map<String ,Object> tmpRuleRow = (Map<String ,Object>) ruleDAO.ruleList(dataMap2);
+
+		String sql = "";
+		List resultList	= new ArrayList<>();
+
+		int before = 0;
+		for ( int fx=0; fx<column.length; ++fx ) {
+			String columnKey = column[fx];
+			int total	= dataList.size();
+			
+			String tmpRuleSql = "  " + column[fx] +" "+ ruleMap.get("RULE_CONT").toString()+ " " ;  
+			if(!"".equals(filterTmpSql)){
+				sql = " AND ( "	+filterTmpSql + " ) AND ( "	+	tmpRuleSql	+" )";
+			} else {
+				sql = " AND ( "	+	tmpRuleSql	+" )";
+			}
+			
+			dataMap2.put("sql", sql);
+			
+			dataList	= processDAO.selectTempDataList(dataMap2);
+			int diff    = dataList.size();
+			 
+			String sColumnName  = "";
+			
+			for(int i=0;i<sessionKey.length;i++){
+				if(sessionKey[i].toString().equals(columnKey)){
+					sColumnName = sessionName[i].toString();
+				}
+			}
+			
+			Map<String ,Object> tmp1Map = new HashMap<String ,Object>();
+			Map<String ,Object> tmp2Map = new HashMap<String ,Object>();
+			
+			tmp2Map.put("total"	        ,total);
+			tmp2Map.put("diff"	        ,total - diff);
+			tmp2Map.put("before"	    ,total-before);
+			tmp2Map.put("ruleIdx"	    ,tmpRuleRow.get("RULE_SN").toString());
+			tmp2Map.put("columnName"	,sColumnName);
+			tmp1Map.put(columnKey, tmp2Map);
+			resultList.add(tmp1Map);
+			before   += (total - diff); 
+		}
+		
+		result.put(tmpRuleRow.get("RULE_NM").toString(), resultList);
+		return result;
+	}
+	
+	/* d3 관련 filter sql 만들기 */
+	@Override
+	public Map<String ,Object> filterCntSqlInfo(Map<String ,Object> dataMap2)throws Exception {
+		Map<String ,Object> result = new HashMap<String ,Object>();
+		
+		String[] sessionName = UtilSession.getAttribute("SESSION_TABLE_HEADER").toString().split(",");
+		String[] sessionKey	 = UtilSession.getAttribute("SESSION_TABLE_HEADER_KEY").toString().split(",");
+		String		ruleSn   = dataMap2.get("Rule").toString();
+		String[]	column   = dataMap2.get("Column").toString().split(",");
+		
+		dataMap2.put( "RULE_SN"		    ,ruleSn											);
+		dataMap2.put( "TEMP_TABLE_NM"	,UtilSession.getAttribute("SESSION_TABLE_NAME")	);
+		
+		List<?>             ruleTmp		= ruleDAO.list(dataMap2);
+		Map<String ,Object> ruleMap		= (Map<String ,Object>) ruleTmp.get(0);
+		
+		List<?> dataList = processDAO.selectTempDataList(dataMap2);
+		Map<String ,Object> tmpRuleRow = (Map<String ,Object>) ruleDAO.ruleList(dataMap2);
+//		System.out.println("result=========="+tmpRuleRow.get("RULE_NM"));
+		String sql = "";
+		List resultList	= new ArrayList<>();
+
+		int before = 0;
+		for ( int fx=0; fx<column.length; ++fx ) {
+			String columnKey = column[fx];
+			int total	= dataList.size();
+			
+			String tmpFilterSql = "  " + column[fx] +" "+ ruleMap.get("RULE_CONT").toString()+ " " ;  
+			if(!"".equals(filterTmpSql)){
+				sql = " AND ( "	+filterTmpSql + " ) AND ( "	+	tmpFilterSql	+" )";
+			} else {
+				sql = " AND ( "	+	tmpFilterSql	+" )";
+			}
+			
+			dataMap2.put("sql", sql);
+			
+			dataList	= processDAO.selectTempDataList(dataMap2);
+			int diff    = dataList.size();
+			
+			String sColumnName  = "";
+			
+			for(int i=0;i<sessionKey.length;i++){
+				if(sessionKey[i].toString().equals(columnKey)){
+					sColumnName = sessionName[i].toString();
+				}
+			}
+			Map<String ,Object> tmp1Map = new HashMap<String ,Object>();
+			Map<String ,Object> tmp2Map = new HashMap<String ,Object>();
+			tmp2Map.put("total"	        ,total);
+			tmp2Map.put("diff"	        ,total - diff);
+			tmp2Map.put("before"	    ,total-before);
+			tmp2Map.put("ruleIdx"	    ,tmpRuleRow.get("RULE_SN").toString());
+			tmp2Map.put("columnName"	,sColumnName);
+			tmp1Map.put(columnKey, tmp2Map);
+			resultList.add(tmp1Map);
+			before   += (total - diff); 
+		}
+		result.put(tmpRuleRow.get("RULE_NM").toString(), resultList);
+		return result;
+	}
+	
+	
+	/* rule 관련 sql 만들기 */
+	@Override
+	public Map<String ,Object>  ruleAllSqlInfo(Map<String ,Object> map) throws Exception {
+		Map<String ,Object> result = new HashMap<String ,Object>();
+		List resultList	= new ArrayList<>();
+		String[] var;
+		String sql = "";
+		var = map.get("Column").toString().split(",");
+		
+		String[] sessionName = UtilSession.getAttribute("SESSION_TABLE_HEADER").toString().split(",");
+		String[] sessionKey	 = UtilSession.getAttribute("SESSION_TABLE_HEADER_KEY").toString().split(",");
+
+		 
+		map.put("RULE_SN"       ,map.get("Rule"));
+		map.put("TEMP_TABLE_NM"	,UtilSession.getAttribute("SESSION_TABLE_NAME")	);
+		List<?> ruleTmp		= ruleDAO.list(map);
+		List<?> dataList    = processDAO.selectTempDataList(map);
+		Map<String ,Object> ruleMap				= (Map<String ,Object>) ruleTmp.get(0);
+		
+		int before = 0;
+		for( int fx=0; fx<var.length; ++fx ) {
+			if("".equals(ruleAllTmpSql)){                                                                                                          
+				ruleAllTmpSql =  " "     +  var[fx]+ " " + ruleMap.get("RULE_CONT").toString()  + " " ;                                                
+			} else {                                                                                                                            
+				ruleAllTmpSql += " OR  "+  var[fx]+ " " + ruleMap.get("RULE_CONT").toString()  + " " ;                                           
+			}    
+			String columnKey = var[fx];
+			int total	= dataList.size();
+			
+			String tmpRuleSql = "  " + var[fx] +" "+ ruleMap.get("RULE_CONT").toString()+ " " ;  
+			if(!"".equals(filterAllTmpSql)){
+				sql = " AND ( "	+filterAllTmpSql + " ) AND ( "	+	tmpRuleSql	+" )";
+			} else {
+				sql = " AND ( "	+	tmpRuleSql	+" )";
+			}
+			
+			map.put("sql", sql);
+			
+			dataList	= processDAO.selectTempDataList(map);
+			int diff    = dataList.size();
+			
+			 
+			String sColumnName  = "";
+			
+			for(int i=0;i<sessionKey.length;i++){
+				if(sessionKey[i].toString().equals(columnKey)){
+					sColumnName = sessionName[i].toString();
+				}
+			}
+			Map<String ,Object> tmp1Map = new HashMap<String ,Object>();
+			Map<String ,Object> tmp2Map = new HashMap<String ,Object>();
+			tmp2Map.put("total"	        ,total);
+			tmp2Map.put("diff"	        ,total - diff);
+			tmp2Map.put("before"	    ,total-before);
+			tmp2Map.put("ruleIdx"	    ,ruleMap.get("RULE_SN").toString());
+			tmp2Map.put("columnName"	,sColumnName);
+			tmp1Map.put(columnKey, tmp2Map);
+			resultList.add(tmp1Map);
+			before   += (total - diff); 
+		}
+		result.put(ruleMap.get("RULE_NM").toString(), resultList) ;
+		return result;
+	}
+	
+	/* 필터 관련 sql 만들기 */
+	@Override
+	public void filterAllSqlInfo(Map<String ,Object> map) throws Exception {
+		String[] var;
+		String sql = "";
+		var = map.get("Column").toString().split(",");
+		 
+		map.put("RULE_SN" ,map.get("Rule"));
+		List<?> ruleTmp		= ruleDAO.list(map);
+		Map<String ,Object> ruleMap				= (Map<String ,Object>) ruleTmp.get(0);
+		for( int fx=0; fx<var.length; ++fx ) {
+			if("".equals(filterAllTmpSql)){                                                                                                          
+				filterAllTmpSql =  " "     +  var[fx]+ " " + ruleMap.get("RULE_CONT").toString()  + " " ;                                                
+			} else {                                                                                                                            
+				filterAllTmpSql += " AND  "+  var[fx]+ " " + ruleMap.get("RULE_CONT").toString()  + " " ;                                           
+			}                                                                                                                                   
+		}
+		
+	}
+	
+	
+	
+}
+

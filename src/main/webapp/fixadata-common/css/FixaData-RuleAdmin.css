@@ -1,0 +1,92 @@
+@charset "utf-8";
+
+
+/*===================================================================================================
+#	콘텐츠 디자인: Content Area							*/
+#arRuleAdmin											{ position:relative; height:calc(100% - 88.38px); padding:10px; }
+#formUpdate												{ position:relative; height:calc(100% - 88.38px); padding:10px; }
+#wrRuleForm												{ padding:10px 0; }
+
+
+
+/*===================================================================================================
+#	콘텐츠 디자인: List									*/
+#wrRuleList												{ height:calc(100% - 20px); padding:10px; background-color:#2d2d2d; overflow-y:scroll; }
+#itmRuleList											{ width:100%; border-collapse:0; border-spacing:0; }
+#itmRuleList .alignCenter								{ text-align:center; }
+#itmRuleList td ,#itmRuleList th						{ height:34px; padding:0 10px; border-left:1px solid #3f3f3f; line-height:1em; color:#ffffff; font-weight:100; }
+#itmRuleList td:first-child ,#itmRuleList th:first-child{ border-left:0 none; }
+#itmRuleList th											{ background-color:#363636; }
+#itmRuleList td											{ border-top:1px solid #3f3f3f; background-color:#4d4d4d; }
+#itmRuleList td:last-child								{ width:118px; }
+#itmRuleList tr:first-child td							{ border-top:0 none !important; }
+#itmRuleList ._btn										{ margin:0 4px; }
+
+#wrMemberList												{ height:calc(100% - 20px); padding:10px; background-color:#2d2d2d; overflow-y:scroll; }
+#itmMemberList											{ width:100%; border-collapse:0; border-spacing:0; }
+#itmMemberList .alignCenter								{ text-align:center; }
+#itmMemberList td ,#itmMemberList th						{ height:34px; padding:0 10px; border-left:1px solid #3f3f3f; line-height:1em; color:#ffffff; font-weight:100; }
+#itmMemberList td:first-child ,#itmMemberList th:first-child{ border-left:0 none; }
+#itmMemberList th											{ background-color:#363636; }
+#itmMemberList td											{ border-top:1px solid #3f3f3f; background-color:#4d4d4d; }
+#itmMemberList td:last-child								{ width:118px; }
+#itmMemberList tr:first-child td							{ border-top:0 none !important; }
+#itmMemberList ._btn										{ margin:0 4px; }
+
+
+#wrStandardList												{ height:calc(100% - 20px); padding:10px; background-color:#2d2d2d; overflow-y:scroll; }
+#itmStandardList											{ width:100%; border-collapse:0; border-spacing:0; }
+#itmStandardList .alignCenter								{ text-align:center; }
+#itmStandardList td ,#itmStandardList th						{ height:34px; padding:0 10px; border-left:1px solid #3f3f3f; line-height:1em; color:#ffffff; font-weight:100; }
+#itmStandardList td:first-child ,#itmStandardList th:first-child{ border-left:0 none; }
+#itmStandardList th											{ background-color:#363636; }
+#itmStandardList td											{ border-top:1px solid #3f3f3f; background-color:#4d4d4d; }
+#itmStandardList td:last-child								{ width:118px; }
+#itmStandardList tr:first-child td							{ border-top:0 none !important; }
+#itmStandardList ._btn										{ margin:0 4px; }
+
+
+
+
+/*===================================================================================================
+#	콘텐츠 디자인: Insert Form							*/
+#formRule select										{ width:100px; height:46.39px; border-color:#565656; color:#ffffff; background-color:#000000; }
+#formRule ._form-input ,#formRule ._form-input input	{ border-color:#565656; background-color:#000000 !important; }
+#formRule ._form-input									{ margin-left:15px; }
+#wrRuleForm ._btn										{ height:14px; margin-left:20px; padding:14.5px 18px; }
+#form_ruleCont ,#form_ruleDc							{ width:280px; }
+
+#formMember select										{ width:100px; height:46.39px; border-color:#565656; color:#ffffff; background-color:#000000; }
+#formMember ._form-input ,#formMember ._form-input input	{ border-color:#565656; background-color:#000000 !important; }
+#formMember ._form-input									{ margin-left:15px; }
+#wrMemberForm ._btn										{ height:14px; margin-left:20px; padding:14.5px 18px; }
+#form_memberCont ,#form_memberDc							{ width:280px; }
+
+#formStandardVoca select										{ width:100px; height:46.39px; border-color:#565656; color:#ffffff; background-color:#000000; }
+#formStandardVoca ._form-input ,#formStandardVoca ._form-input input	{ border-color:#565656; background-color:#000000 !important; }
+#formStandardVoca ._form-input									{ margin-left:15px; }
+#wrStandardVocaForm ._btn										{ height:14px; margin-left:20px; padding:14.5px 18px; }
+#wrImportForm ._btn										{ height:14px; margin-left:20px; padding:14.5px 18px; }
+#form_standardVocaCont ,#form_standardVocaDc							{ width:280px; }
+
+#formStandardVoca select										{ width:100px; height:46.39px; border-color:#565656; color:#ffffff; background-color:#000000; }
+#formStandardVoca ._form-input ,#formStandardVoca ._form-input input	{ border-color:#565656; background-color:#000000 !important; }
+#formStandardVoca ._form-input									{ margin-left:15px; }
+#wrCordDomainForm ._btn										{ height:14px; margin-left:20px; padding:14.5px 18px; }
+#form_standardVocaCont ,#form_standardVocaDc							{ width:280px; }
+
+/*===================================================================================================
+#	콘텐츠 디자인: 프로젝트 저장 모달창					*/
+/* #formUpdate												{ position:absolute; left:calc(50% - 300px); top:calc(50% - 300px); width:600px; text-align:left; background-color:#4b4b4b; }
+#formUpdate .title										{ height:12px; padding:10px; color:#ffffff; line-height:1em; background-color:#404040 }
+#formUpdate .content									{ padding:20px; text-align:center; }
+#formUpdate .content ._form-input						{ margin:0 5px; border:0 none; background-color:#000000; }
+#formUpdate .content ._form-input input					{ background-color:#000000; }
+#formUpdate .itmButton									{ padding:15px 0 20px 0; text-align:center; }
+#formUpdate .button										{ display:inline-block; width:138px; height:12px; margin:0 30px; padding:10px 0; border-radius:15px; border:1px solid #cecece; text-align:center; font-weight:bold; line-height:1em; }
+#formUpdate .button:first-child							{ border-color:#989898; color:#ababab; }
+#formUpdate .button:first-child:hover					{ color:#ffffff; } */
+
+
+
+

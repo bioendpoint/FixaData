@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fixadata.prep.mapper.PrepMapper">
+
+	<!--  -->
+	<select id="selectPrepData" 
+			parameterType="fixadata.prep.vo.prepVO"
+			resultType="fixadata.prep.vo.prepVO"
+			>
+			select * from dbinfo where member_sn = #{member_sn}	
+	</select>
+	
+	<!-- 전처리 데이터 로드  -->
+	<select id="selectTbProjectData" parameterType="fixadata.collect.vo.tbProjectDataVO" resultType="fixadata.collect.vo.tbProjectDataVO">
+		select 
+			   data
+			   , header
+			   , header_option
+			   , diagram_layout
+			   , collect_info
+			   , step
+			   , result
+			   , insert_dt
+			   , data_version
+			   , project_sn
+			   , project_data_sn
+			   , mac_address
+			   , blockchain
+		 from project_data
+		 where project_data_sn = #{project_data_sn}
+		   and project_sn = #{project_sn}
+	</select>
+	
+	<!-- 프로젝트 FLAG 체크 0일경우 프로젝트 등록 -->
+	<select id="selectTbProjectCheck" parameterType="fixadata.collect.vo.tbProjectVO" resultType="fixadata.collect.vo.tbProjectVO">
+		select   project_sn
+			   , member_sn
+			   , project_name
+			   , flag
+			   , insert_dt
+			   , workflow
+		 from project
+		 where project_sn = #{project_sn}
+	</select>
+	
+	<!-- PROJECT 프로젝트 등록  -->
+	<update id="updateTbProject"  parameterType="fixadata.collect.vo.tbProjectVO">
+		update project 
+				set project_name = #{project_name}  ,
+				    flag         = #{flag},
+				    workflow     = #{workflow}
+			  where project_sn   = #{project_sn}
+	
+	</update>
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fixadata.outprocess.mapper.OutProcessMapper">
+
+	  
+	<select id="list" parameterType="Map" resultType="Map">
+			${sql}
+	</select>
+	
+	<select id="selectOne" parameterType="Map" resultType="Map">
+				
+		select prjct_sn,
+			   prjct_nm,
+			   real_file_nm,
+			   temp_table_nm,
+			   save_dt,
+			   temp_table_header,	
+			   temp_table_header_key
+		  from tb_project_master
+			where 1=1 
+		<if test="prjct_sn != null and prjct_sn != ''">
+			 and prjct_sn = #{prjct_sn} 
+		</if>
+	</select>
+	 
+</mapper>

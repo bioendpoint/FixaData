@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fixadata.member.mapper.MemberMapper">
+	
+	
+	<select id="memberList" parameterType="Map" resultType="Map">
+		
+		select	member_sn ,member_id ,member_pw ,member_auth
+		from	member
+		<where>
+			<if test="member_sn != null and member_sn !=''">
+			and	member_sn = #{member_sn}
+			</if>
+			<if test="member_id != null and member_id !=''">
+			and	member_id = #{member_id}
+			</if>
+			<if test="member_auth != null and member_auth !=''">
+			and	member_auth = #{member_auth}
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectMemberList" parameterType="Map" resultType="Map">
+		
+		select	member_sn ,member_id ,member_pw ,member_auth
+		from	member
+		
+	</select>
+	
+	<insert id="memberSave" parameterType="Map" >
+	<if test="state != null and  state == 1">
+		insert into  member
+		(
+             member_sn     
+            , member_id       
+            , member_pw           
+            , member_auth         
+		)
+		values(
+		   (select ifnull ((select  max(member_sn)+1  from member )  ,1 ))
+		 , #{member_id}
+		 , #{member_pw}
+		 , #{member_auth}
+		)
+		 </if>
+	    <if test="state != null and  state == 2">
+	     update member set 
+	     	member_id	= #{member_id}
+	     , member_pw	= #{member_pw}
+	     , member_auth	= #{member_auth}
+	     where member_sn = #{member_sn}
+	    
+	     </if>
+	    <if test="state != null and  state == 3">
+	      delete from  member
+		     where member_sn  = #{member_sn}     
+	      </if>
+	</insert> 
+	
+	<select id="memberChk" parameterType="Map" resultType="Integer">
+		select  count(*)
+		from	member
+		where	member_id = #{member_id}
+	</select>
+	
+	<update id="updateMemberMacAddress" parameterType="Map">
+		update member set 
+			mac_address = #{mac_address} 
+				where 
+					member_id = #{member_id}
+	</update>
+
+</mapper>

@@ -1,0 +1,105 @@
+@charset "utf-8";
+@import  "/_geo-common/_geo-css/_geo-ui-font-notosanskr.css";
+@import  "/_geo-common/_geo-css/_geo-ui-reset-v4.01.css";
+
+
+/*===================================================================================================
+#	기본 디자인 환경 정의						*/
+html											{ font-size:12px; }
+html ,body ,#_body ,#_inni						{ min-width:1440px; min-height:100%; }
+html ,body
+	, div ,p ,dl ,dt ,ul ,ol ,li
+	, dd ,h1 ,h2 ,h3 ,h4 ,h5 ,h6
+	, form ,button ,input ,label
+	, select ,textarea ,fieldset
+	, strong ,article ,aside
+	, dialog ,figcaption ,figure
+	, footer ,header ,hgroup ,main
+	, nav ,section ,a ,address
+	, legend									{ font-family:'Noto Sans Korean','sans-serif'; font-weight:350; }
+hr												{ display:none; }
+input											{border: 1px solid #d3d3d3;background-color: #fff;padding:5px 15px;border-radius: 5px;}
+input[type=file]								{ width:100%; padding:0 0 1.28em; }
+input.fileMulti									{ height:250px; }
+select											{height:2.4em;padding:0 0 0 0.5em;border-radius:0.2em;border: 1px solid #d3d3d3;}
+input:focus										{ color:#000000; }
+
+
+/*===================================================================================================
+#	공통 클레스 정의							*/
+._clear											{ display:block; clear:both; }
+._hide ,._caption								{ display:block; position:absolute; top:-999999px; left:-999999px; width:0px; height:0px; text-indent:-999999px; overflow:hidden; }
+._none											{ display:none !important; }
+._fontSize										{ font-size:1em; }
+._fontSizeSmall									{ font-size:0.8em; }
+._fontSizeBig									{ font-size:1.2em; }
+._fontSizeH1									{ font-size:2em; }
+._fontSizeH2									{ font-size:1.8em; }
+._fontSizeH3									{ font-size:1.4em; }
+._fontSizeH4									{ font-size:1em; }
+._fontBold										{ font-weight:bold; }
+._fontNormal									{ font-weight:normal; }
+
+
+/*===================================================================================================
+#	close : 레이어 닫기 버튼					*/
+._close											{ z-index:9989; display:block; width:40; height:40; text-indent:-99999px; background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjBDQkNBNUYwRTFBNzExRTdBOUQzOTIwNDExMTVGQkM1IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjBDQkNBNUYxRTFBNzExRTdBOUQzOTIwNDExMTVGQkM1Ij4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MENCQ0E1RUVFMUE3MTFFN0E5RDM5MjA0MTExNUZCQzUiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MENCQ0E1RUZFMUE3MTFFN0E5RDM5MjA0MTExNUZCQzUiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4bB1joAAABUklEQVR42qyVUWqEMBCG43gPxVdbpBco4hX60LLVoxR2S3sULbQPvYF6A9mWFvqoHkPo2vkXI+JGE+gOhJjJ/B+jmYyi73shR1EU/nRtMlhzMV2TGKwsyx1PnzzfCkPj2DuePnjeSh9JWFVV2yzLbF6+mEAHWJamqc3anYTaYRheApLnObVtK3hQEAQ3dV3/eJ73rYNB03WdYM01a94piqIv3oyTJPl1HEc0TSPWMp3DoIEWDLCOr8wPryZQDQwMYeFklgSu64o4jiG4R6wOdgJcgR6wxz5agymBKqhlWUc/YtdgY9nMbfJND4DJosUzfEuwReB/jDR1RjIzmSl82BtiTuzsh0IGMAg3KB1Zp9hDjCpTMqlBzuJtXvxLUDKBKU5/EWpxP0Nz2Otghvf5SjaHZ9/3jWCqTKFlewJrPOWhwT7oYKpMB9jjeJ3O+Qv4E2AA8J3OETR4MrsAAAAASUVORK5CYII=); background-repeat:no-repeat; background-position:center center; overflow:hidden; }
+
+
+/*===================================================================================================
+#	북마크 - 바로가기(건너뛰기)					*/
+#_wrBookmark ,#_wrBookmark>li					{ z-index:999998; display:block; position:relative; width:100%; height:0px; }
+#_wrBookmark>li>a								{ z-index:999999; display:block; position:absolute; left:-99999px; top:-99999px; width:0px; height:0px; }
+#_wrBookmark>li>a:focus							{ left:0; top:0; width:100%; height:1em; padding:0.8em 0; text-align:center; color:#ffffff; background-color:rgba(28 ,38 ,66 ,0.9); overflow:hidden; }
+
+
+/*===================================================================================================
+#	modal - 레이어 팝업							*/
+#_wrModal										{ z-index:99985; position:fixed; left:0; top:0; width:100%; height:100%; text-align:center; background-color:rgba(0 ,0 ,0 ,0.7); overflow:hidden; }
+#_wrModal>._modalContainer						{ z-index:99986; display:block; position:relative; height:100%; margin:0 auto; text-align:left; }
+#_wrModal>._modalContainer>._alert				{ z-index:99987; display:block; position:absolute; left:50%; top:30px; width:100%; margin-left:-50%; padding:1em 1em 0 1em; border:1px solid #000000; background-color:#4b4b4b; }
+#_wrModal>._modalContainer>._alert>._message	{ max-height:300px; padding:1em; color:#ffffff; line-height:1.6em; background-color:#323232; overflow-y:scroll; }
+#_wrModal>._modalContainer>._alert>._button		{ padding:1.5em; text-align:center; }
+
+
+
+/*===================================================================================================
+#	버튼 - 기본 레이아웃						*/
+button ,input[type=button] ,._btn				{ display:inline-block; height:1.1em; padding:0.6em 1.4em; border-width:1px; border-style:solid; border-radius:0.2em; line-height:1em; text-decoration:none !important; outline:0px; cursor:pointer; }
+._btnSmall										{ font-size:0.8em; }
+
+
+/*===================================================================================================
+#	버튼 - 기본 색상							*/
+button ,input[type=button] ,._btn				{border-color: #00a4e5;color:#ffffff;background-color: #12ceef;border-radius: 5px; margin:0px}
+button:hover ,input[type=button]:hover
+	,._btn:hover								{color:#ffffff;background-color: #42a6b7;}
+
+/*===================================================================================================
+#	버튼 - 배경색상(진한파랑)					*/
+._btn.darkblue									{ color:#ffffff; border-color:#263047; background-color:#434d63; }
+
+
+/*===================================================================================================
+#	버튼 - 배경색상(진한주황)					*/
+._btn.orange									{ color:#ffffff; border-color:#ca5c20; background-color:#ff5a00; }
+
+
+/*===================================================================================================
+#	form - common								*/
+._form-input									{ display:inline-block; position:relative; border:1px solid #bdbdbd; border-radius:0.2em; box-sizing:border-box; -webkit-box-sizing:border-box; background-color:#ffffff;padding: 1px; }
+
+
+/*===================================================================================================
+#	form - input								*/
+._form-input>label								{z-index:9;position:absolute;left:10px;top:calc(50% - 0.55em);height:100%;color: #595959;font-size:1.2em;line-height:1.1em;letter-spacing:-1px;cursor:text;}
+._form-input>input								{width: calc(100% - 31px);height:calc(100% - 2.2em);padding: 12px 15px;border-radius:0;border:none 0;color: #464646;vertical-align:text-middle;outline:0 none;background-color: #ffffff;border-radius: 5px;}
+._form-input2>input								{height:calc(100% - 2.2em);padding: 4px 15px;border-radius:0;border:none 0;color: #464646;vertical-align:text-middle;outline:0 none;background-color: #ffffff;border-radius: 5px; border: 1px solid #d3d3d3;}
+._form-input.focus>label						{ top:5px; color:#898989; font-size:1em; }
+
+._form-submit									{ width:100%; height:auto; padding:0.8em 0; border-color:#ff3300; text-align:center; color:#dddedf; font-size:1.2em; font-weight:bold; line-height:1.1em; letter-spacing:-1px; background-color:#ff3300; cursor:pointer; }
+._form-submit:focus ,._form-submit:hover		{ color:#ffffff; text-decoration:none; }
+
+.colData{margin: 5px 10px;padding: 10px;background: rgb(241 241 241);border-radius: 5px;color: #000; text-align: left;color:#3284c3}
+
+

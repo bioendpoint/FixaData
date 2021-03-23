@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fixadata.rule.mapper.RuleMapper">
+
+	<select id="selectRuleList" parameterType="Map" resultType="Map">
+			select rule_sn              
+	             , rule_name     
+	             , rule_dc       
+	             , rule_cont           
+	             , rule_gb    
+	             , rule_opt       
+	             , rule_base_data_gb         
+	             , substr(insert_dt,1,10) as insert_dt
+	             , substr(update_dt,1,10) as update_dt
+	             , rule_icon_uri
+			from rule_manager
+			where 1=1 
+		<choose>
+
+			<!--  -->
+			<when test = "(member_auth == 0)">
+			</when>
+			<when test = "(member_auth == 1)">
+				and (rule_member_id = #{member_id} or (rule_opt=0 and rule_member_id is NULL))
+			</when>
+			<when test = "(member_auth == 2)">
+				and (rule_member_id = #{member_id} or (rule_opt=0 and rule_member_id is NULL))
+			</when>
+		</choose>	
+			
+		<if test="rule_sn != null and rule_sn != ''">
+			and rule_sn = #{rule_sn}
+		</if>
+		
+		<if test="rule_base_data_gb != null and rule_base_data_gb != ''">
+			and rule_base_data_gb = #{rule_base_data_gb}
+		</if>
+			
+		    order by rule_opt asc, rule_sn asc
+	</select>
+
+	<select id="ruleList" parameterType="Map" resultType="Map">
+			select rule_sn              
+	             , rule_name     
+	             , rule_dc       
+	             , rule_cont           
+	             , rule_opt
+	             , rule_gb           
+	             , rule_base_data_gb         
+	             , substr(insert_dt    ,1,10) as insert_dt
+	             , substr(update_dt  ,1,10) as update_dt
+			from rule_manager
+			where 1=1 
+		<if test="rule_sn != null and rule_sn != ''">
+			 and	rule_sn =  #{rule_sn} 
+		</if>
+		   order by rule_sn asc
+	</select>
+	
+	<insert id="save" parameterType="Map" >
+		 <if test="state != null and  state == 1">
+				insert into  rule_manager
+				(
+				   rule_sn              
+	             , rule_name     
+	             , rule_dc       
+	             , rule_cont           
+	             , rule_gb           
+	             , rule_base_data_gb         
+	             , insert_dt
+	             , rule_member_id
+	             , rule_opt
+				)
+				values(
+				   (select ifnull ((select  max(rule_sn)+1  from rule_manager )  ,1 ))
+				 , #{rule_name}
+				 , #{rule_dc}
+				 , #{rule_cont}
+				 , #{rule_gb}
+				 , #{rule_base_data_gb}
+				 , strftime('%y-%m-%d %h:%m:%s','now','localtime')
+				 , #{rule_member_id}  
+				 , #{rule_opt}  
+				 
+				)
+	    </if>
+	    <if test="state != null and  state == 2">
+		    update rule_manager
+				   set rule_name	= #{rule_name}
+				     , rule_dc		= #{rule_dc}
+	                 , rule_cont	= #{rule_cont}
+	                 , rule_opt		= #{rule_opt}
+	                 
+	                 , update_dt	= strftime('%y-%m-%d %h:%m:%s','now','localtime')
+			     where rule_sn		= #{rule_sn}
+	    </if>
+	    <if test="state != null and  state == 3">
+		    delete from  rule_manager
+		     where rule_sn  = #{rule_sn}     
+	    </if>
+	</insert> 
+	<insert id="templateSave" parameterType="fixadata.rule.vo.ruleManagerVO">
+				insert into  rule_manager
+				(
+				   rule_sn              
+	             , rule_name     
+	             , rule_dc       
+	             , rule_cont           
+	             , rule_gb           
+	             , rule_base_data_gb         
+	             , insert_dt
+	             , rule_member_id
+	             , rule_opt
+				)
+				values(
+				   (select ifnull ((select  max(rule_sn)+1  from rule_manager )  ,1 ))
+				 , #{rule_name}
+				 , #{rule_dc}
+				 , #{rule_cont}
+				 , #{rule_gb}
+				 , #{rule_base_data_gb}
+				 , strftime('%y-%m-%d %h:%m:%s','now','localtime')
+				 , #{rule_member_id}  
+				 , #{rule_opt}  
+				 
+				)
+	    
+	</insert> 
+
+</mapper>

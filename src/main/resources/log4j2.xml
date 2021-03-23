@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %5p [%c] %m%n" />
+            <RegexFilter regex="(?s).*==IGNORE_LOG==.*" onMatch="DENY" onMismatch="NEUTRAL" useRawMsg="true" />
+        </Console>
+        
+        <File name="file" fileName="d:/log/fixaapp.log" append="true">
+            <PatternLayout pattern="%t %-5p %c{2} - %m%n" />
+        </File>
+        
+    </Appenders>
+    	
+	
+    
+    <Loggers>
+        <Logger name="java.sql" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="egovframework" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+		  <!-- log SQL with timing information, post execution -->
+	    <Logger name="jdbc.sqltiming" level="INFO" additivity="false">
+	        <AppenderRef ref="console" />
+		</Logger>
+	    
+	    <!-- log SQL with timing information, post execution -->
+	    <Logger name="fixadata" level="DEBUG" additivity="false">
+	        <AppenderRef ref="console" />
+		</Logger>
+	    
+	    <!-- 대량 insert 진행시 console.log 에 내용 출력제외 -->
+	    <Logger name="fixadata.collect.mapper.CollectMapper.insertTbProjectData" level="error">
+	    	<AppenderRef ref="console" />
+	    </Logger>
+	     	 <!-- 대량 update 진행시 console.log 에 내용 출력제외 -->
+	    <Logger name="fixadata.collect.mapper.CollectMapper.updateTbProjectData" level="error">
+	    	<AppenderRef ref="console" />
+	    </Logger> 
+	    
+	   	 <!-- 대량 insert 진행시 console.log 에 내용 출력제외(스케쥴링) --> 
+	    <Logger name="fixadata.collect.mapper.CollectMapper.insertScheduleData" level="error">
+	    	<AppenderRef ref="console" />
+	    </Logger>
+	    
+	    <!-- 대량 update 진행시 console.log 에 내용 출력제외(다이어그램) --> 
+	    <Logger name="fixadata.collect.mapper.CollectMapper.diagramUpdateTbProjectData" level="error">
+	    	<AppenderRef ref="console" />
+	    </Logger>
+	    
+	    
+	    
+        <Root level="DEBUG">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="file" />
+        </Root>
+        
+        
+    </Loggers>
+</Configuration>

@@ -1,0 +1,93 @@
+@charset "utf-8";
+@import  "/_geo-common/_geo-css/_geo-ui-reset-v4.01.css";
+
+
+
+
+
+/*===================================================================================================
+#	버튼 - 기본 레이아웃					*/
+button
+	, input[type=button]
+	, input[type=submit]
+	, ._btn ,._btnBig ,._btnSmall
+	, ._btnDarkblue ,._btnBigDarkblue
+	, ._btnSmallDarkblue						{ display:inline-block; height:1em; padding:0.6em 1.1em 0.6em 1.1em; border-width:1px; border-style:solid; border-radius:0.2em; vertical-align:text-middle; line-height:1em; text-decoration:none !important; font-weight:bold; cursor:pointer }
+._btnBig ,_btnBigDarkblue						{ font-size:1.2em }
+._btnSmall ,_btnSmallDarkblue					{ padding:0.70em 1.1em 0.5em 1.1em; font-size:0.75em }
+
+
+/*===================================================================================================
+#	버튼 - 기본 색상(회색)					*/
+button
+	, input[type=button]
+	, input[type=submit]
+	, ._btn
+	, ._btnBig
+	, ._btnSmall								{ border-color:#6a6a6a; color:#464646; background-color:#fff }
+button:hover
+	, input[type=button]:hover
+	, input[type=submit]:hover
+	, ._btn:hover
+	, ._btnBig:hover
+	, ._btnSmall:hover							{ border-color:#2d3036; color:#ffffff; background-color:#2d3036 }
+
+
+/*===================================================================================================
+#	버튼 - 다크블루							*/
+._inni_color_darkblue button
+	, ._inni_color_darkblue input[type=button]
+	, ._inni_color_darkblue input[type=submit]
+	, ._inni_color_darkblue ._btn
+	, ._inni_color_darkblue ._btnBig
+	, ._inni_color_darkblue ._btnSmall			{ border-color:#5c667d; color:#ffffff; background-color:#3e4b68 }
+._inni_color_darkblue button:hover
+	, ._inni_color_darkblue input[type=button]:hover
+	, ._inni_color_darkblue input[type=submit]:hover
+	, ._inni_color_darkblue ._btn:hover
+	, ._inni_color_darkblue ._btnBig:hover
+	, ._inni_color_darkblue ._btnSmall:hover	{ border-color:#6a6a6a; color:#000000; background-color:#fff }
+
+._btnDarkblue button
+	, input[type=button]._btnDarkblue
+	, input[type=submit]._btnDarkblue
+	, ._btnDarkblue
+	, ._btnBigDarkblue
+	, ._btnSmallDarkblue						{ border-color:#5c667d; color:#ffffff; background-color:#3e4b68 }
+._btnDarkblue button:hover
+	, ._btnDarkblue input[type=button]:hover
+	, ._btnDarkblue input[type=submit]:hover
+	, ._btnDarkblue:hover
+	, ._btnBigDarkblue:hover
+	, ._btnSmallDarkblue:hover					{ border-color:#6a6a6a; color:#000000; background-color:#fff }
+
+
+/*===================================================================================================
+#	form - common							*/
+._form ,._form-select ,._form-input
+	,._form-radio								{ display:inline-block; position:relative; height:2.2em; border:1px solid #bdbdbd }
+._form-input ,_form-radio						{ width:25% }
+
+
+/*===================================================================================================
+#	form - select							*/
+._form-select									{ position:relative }
+._form-select dl>dt ,._form-select dl>dd		{ padding:0.4em 0.6em; font-size:1em }
+._form-select dl>dt								{  }
+
+
+/*===================================================================================================
+#	form - input							*/
+._form-input									{ }
+._form-input>input								{ width:100%; height:2.16em; vertical-align:text-middle }
+
+
+/*===================================================================================================
+#	form - radio							*/
+._form-radio									{ width:50%; border:1px solid #bdbdbd; text-align:right }
+._form-radio>span								{ z-index:-1; float:left; display:block; height:1em; padding:0.6em 1em; text-align:left }
+._form-radio>a									{ display:inline-block; width:4em; height:1em; padding:0.6em 0; border-left:1px solid #bdbdbd; text-align:center; color:#464646; background-color:#fff }
+._form-radio>a:focus ,._form-radio>a:hover
+	,._form-radio>a.on							{ color:#ffffff; background-color:#2d3036 }
+
+

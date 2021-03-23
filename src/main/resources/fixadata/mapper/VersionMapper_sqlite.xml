@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fixadata.collect.mapper.CollectMapper">
+	<select id="selectVersionInfo" resultType="fixadata.collect.vo.versionInfoVO">
+			select version_sn              
+	             , version_nm     
+	             , insert_dt       
+	             , update_dt    
+			from version_info
+			order by version_sn desc
+			LIMIT 1
+	</select>
+	<select id="selectVersionInfoCheck" resultType="int">
+			select count(*)
+			from version_info
+	</select>
+	
+	<insert id="insertVersionDefault" >
+		insert into version_info(
+			version_sn
+			, version_nm
+			, insert_dt
+		)
+		values
+		(
+			 (select ifnull ((select  max(version_sn)+1  from version_info )  ,1 ))
+			, '00000000-001'
+			,datetime('now','localtime')
+		) 
+	</insert>
+	
+</mapper>

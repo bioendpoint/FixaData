@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="fixadata.process.mapper.ProcessMapper">
+	<select id="selectProjectList" resultType="hashMap">
+		SELECT PRJCT_SN,
+			   PRJCT_NM,
+			   REAL_FILE_NM,
+			   TEMP_TABLE_NM,
+			   SAVE_DT,
+			   TEMP_TABLE_HEADER,	
+			   TEMP_TABLE_HEADER_KEY
+		  FROM TB_PROJECT_MASTER
+		 WHERE 1=1
+		   <if test="PRJCT_SN != null and PRJCT_SN !=''">
+		   AND PRJCT_SN = #{PRJCT_SN}
+		   </if>
+		    <if test="TEMP_TABLE_NM != null and TEMP_TABLE_NM !=''">
+		   AND TEMP_TABLE_NM = #{TEMP_TABLE_NM}
+		   </if>
+	</select>
+
+	<select id="selectHistMaxSn" parameterType="hashMap" resultType="int">
+		SELECT IFNULL(MAX(HIST_SN)+1,1) FROM ${TEMP_TABLE_NM}
+	</select>
+	
+	<select id="selectHistCnt" parameterType="hashMap" resultType="int">
+		SELECT COUNT(*) AS TOTAL_CNT
+		  FROM ${TEMP_TABLE_NM}
+		 WHERE 1=1
+		<choose>
+		  <when test="HIST_SN != null and HIST_SN != ''">
+		   AND HIST_SN = #{HIST_SN}
+		  </when>
+		  <otherwise>
+		   AND HIST_SN = (SELECT MAX(HIST_SN) FROM ${TEMP_TABLE_NM})
+		  </otherwise>
+		</choose>
+		<if test="sql != null and sql != ''">
+		 	${sql}
+		 </if>
+	</select>
+
+	<select id="selectTempColumnList" parameterType="hashMap" resultType="hashMap">
+		PRAGMA TABLE_INFO(${TEMP_TABLE_NM})
+	</select>
+	
+	<select id="selectTempDataList" parameterType="hashMap" resultType="java.util.LinkedHashMap">
+		SELECT * 
+		 FROM ( SELECT *  FROM ${TEMP_TABLE_NM}
+		       WHERE HIST_SN = (SELECT MAX(HIST_SN) FROM ${TEMP_TABLE_NM})
+		      ) 
+		WHERE 1=1
+		 <if test="sql != null and sql != ''">
+		 	${sql}
+		 </if>
+	</select>
+	
+	<select id="selectOutputList" parameterType="hashMap" resultType="java.util.LinkedHashMap">
+		SELECT	${TEMP_CHECK_COLUMN}
+		UNION ALL
+		SELECT	${TEMP_COLUMN_NM}
+		FROM	${TEMP_TABLE_NM}
+		WHERE	HIST_SN = (SELECT MAX(HIST_SN) FROM ${TEMP_TABLE_NM})
+	</select>
+	
+	<select id="createTempTable" parameterType="hashMap">
+		${SQL}
+	</select>
+	
+	<select id="insertHistData" parameterType="hashMap">
+		${SQL}
+	</select>
+	
+	<insert id="insertOutput" parameterType="hashMap">
+		INSERT INTO ${TEMP_TABLE_NM} (HIST_SN ,${column})
+			SELECT (HIST_SN + 1) HIST_SN ,${column} FROM ${TEMP_TABLE_NM}
+			WHERE HIST_SN = (SELECT MAX(HIST_SN) FROM ${TEMP_TABLE_NM}) AND ${queryWhere}
+	</insert>
+
+	<insert id="insertPrjInfo" parameterType="hashMap">
+		<selectKey resultType="int" keyProperty="PRJCT_SN" order="BEFORE">
+			SELECT IFNULL(MAX(PRJCT_SN)+1, 1) FROM TB_PROJECT_MASTER
+		</selectKey>
+		INSERT INTO TB_PROJECT_MASTER (
+			PRJCT_SN,
+			PRJCT_NM,
+			REAL_FILE_NM,
+			TEMP_TABLE_NM,
+			SAVE_DT,
+			TEMP_TABLE_HEADER,
+			TEMP_TABLE_HEADER_KEY
+		) VALUES (
+			${PRJCT_SN},
+			#{PRJCT_NM},
+			#{REAL_FILE_NM},
+			'TEMP_TABLE${PRJCT_SN}',
+			DATE('NOW'),
+			#{TEMP_TABLE_HEADER},
+			#{TEMP_TABLE_HEADER_KEY}
+		) 
+	</insert>
+	
+	<insert id="insertPrjHistInfo" parameterType="hashMap">
+		<selectKey resultType="int" keyProperty="HISTORY_SN" order="BEFORE">
+			SELECT IFNULL(MAX(HISTORY_SN)+1, 1) FROM TB_PROJECT_HISTORY
+		</selectKey>
+		INSERT INTO TB_PROJECT_HISTORY (
+			HISTORY_SN,
+			HISTORY_MASTER_FK,
+			HISTORY_VERSION,
+			HISTORY_INSERT_DT,
+			HISTORY_DIAGRAM,
+			HISTORY_GLOBAL
+		) VALUES (
+			${HISTORY_SN},
+			#{PRJCT_SN},
+			<choose>
+				<when test="HIST_SN != null and HIST_SN">
+				#{HIST_SN},
+				</when>
+				<otherwise>
+				(SELECT MAX(HIST_SN) FROM ${TEMP_TABLE_NM}), 
+				</otherwise>
+			</choose>
+			DATE('NOW'),
+			#{DATA_DIAGRAM},
+			#{DATA_GLOBAL}
+		)
+	</insert>
+	
+	<insert id="insertScoreInfo" parameterType="hashMap">
+		INSERT INTO TB_PROJECT_SCORE (
+			MEMBER_SN_FK,
+			PRJCT_SN_FK,
+			PRJCT_SCORE
+		) VALUES (
+			#{MEMBER_SN},
+			#{PRJCT_SN},
+			0
+		)
+	</insert>
+	
+	<update id="updateScore" parameterType="hashMap">
+		UPDATE TB_PROJECT_SCORE
+		   SET PRJCT_SCORE = PRJCT_SCORE + #{PRJCT_SCORE}
+		 WHERE MEMBER_SN_FK = #{MEMBER_SN}
+		   AND PRJCT_SN_FK = #{PRJCT_SN} 
+	</update>
+	
+	<select id="selectScore" parameterType="hashMap" resultType="Int">
+		SELECT IFNULL(PRJCT_SCORE ,COUNT(*)) AS PRJCT_SCORE
+		  FROM TB_PROJECT_SCORE
+		 WHERE MEMBER_SN_FK = #{MEMBER_SN}
+		   AND PRJCT_SN_FK = #{PRJCT_SN}
+	</select>
+	
+	<select id="sql" parameterType="Map" resultType="Map">
+			${sql}
+	</select>
+	
+	<select id="selectPrjHistInfo" parameterType="Map" resultType="Map">
+		SELECT HISTORY_SN,
+			   HISTORY_MASTER_FK,
+			   HISTORY_VERSION,
+			   HISTORY_INSERT_DT,
+			   HISTORY_DIAGRAM,
+			   HISTORY_GLOBAL
+		 FROM  TB_PROJECT_HISTORY
+		WHERE  HISTORY_MASTER_FK = #{PRJCT_SN}
+		  <choose>
+		  	<when test="HIST_SN != null and HIST_SN != ''">
+		  	AND  HISTORY_VERSION = #{HIST_SN}	
+		  	</when>
+		  	<otherwise>
+		  	AND	HISTORY_VERSION = (SELECT MAX(HIST_SN) FROM ${TEMP_TABLE_NM})
+		  	</otherwise>
+		  </choose>
+		  <choose>
+		  	<when test="HISTORY_SN != null and HISTORY_SN">
+		  	AND	HISTORY_SN = #{HISTORY_SN} 
+		  	</when>
+		  	<otherwise>
+		  	AND	HISTORY_SN = (SELECT MAX(HISTORY_SN) FROM TB_PROJECT_HISTORY WHERE HISTORY_MASTER_FK = #{PRJCT_SN} AND HISTORY_VERSION = (SELECT MAX(HIST_SN) FROM ${TEMP_TABLE_NM}))
+		  	</otherwise>
+		  </choose>
+		<choose>
+		</choose>  	
+	</select>
+	
+	<delete id="deleteMinHistSn" parameterType="hashMap">
+		DELETE FROM ${TEMP_TABLE_NM}
+		WHERE	HIST_SN = (
+			SELECT CASE WHEN COUNT(HIST_SN)>5 THEN MIN(HIST_SN) ELSE 0 END
+			FROM (
+				SELECT HIST_SN FROM ${TEMP_TABLE_NM} WHERE HIST_SN!=1 GROUP BY HIST_SN
+			)
+		)
+	</delete>
+	
+	<insert id="insertBlockchain" parameterType="hashMap">
+		INSERT INTO blockchain (
+			PRJCT_SN_FK
+		,	MEMBER_SN_FK
+		,	BCHAIN_HASHCODE
+		,	BCHAIN_VERSION
+		) VALUES (
+			#{PRJCT_SN_FK}
+		,	#{MEMBER_SN_FK}
+		,	#{BCHAIN_HASHCODE}
+		,	(SELECT IFNULL(MAX(BCHAIN_VERSION) ,0) + 1 FROM blockchain WHERE PRJCT_SN_FK = #{PRJCT_SN_FK})
+		)
+	</insert>
+
+	<select id="selectBlockchain" parameterType="Map" resultType="HashMap">
+		SELECT 
+			bcchain_sn 
+			, project_sn 
+			, member_sn 
+			, bcchain_hashcode
+			, bcchain_version
+			, project_name
+			, member_id
+			, member_auth
+			from 
+			(
+				SELECT	a.bcchain_sn
+						, b.project_sn 
+						, b.project_name
+						, a.bcchain_hashcode
+						, a.bcchain_version
+						, c.member_sn 
+						, c.member_id
+						, c.member_auth
+				FROM  blockchain a ,project b ,member c
+				  where	a.member_sn_fk = c.member_sn
+				and 	a.project_sn_fk = b.project_sn
+			)
+		<where>
+			<if test="project_sn_fk!=null and project_sn_fk!=''">AND project_sn_fk = #{project_sn_fk}</if>
+			<if test="project_sn_fk!=null and project_sn_fk!='' and BCHAIN_VERSION_MAX=='true'">AND BCHAIN_VERSION = (SELECT MAX(BCHAIN_VERSION) FROM blockchain WHERE PRJCT_SN_FK = #{PRJCT_SN_FK})</if>
+		</where>
+	</select>
+</mapper>

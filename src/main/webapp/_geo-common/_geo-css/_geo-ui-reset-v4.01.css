@@ -1,0 +1,59 @@
+@charset "utf-8";
+
+
+
+
+
+/*===================================================================================================
+#	Basic Reset Element    */
+html,body{min-height:100%}
+/* html,body{overflow:hidden; overflow-x:hidden; overflow-y:hidden;} */
+html,body{overflow-y:hidden;}
+html,body,div,p,dl,dt,dd,ul,ol.li,h1,h2,h3,h4,h5,h6,form,button,input,label,select,textarea,fieldset,strong,article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section,a,address,legend,video,audio{margin:0;padding:0}
+figcaption,figure,main,details,menu{display:block}
+form{display:inline;}
+canvas,progress{display:inline-block}
+summary{display:list-item}
+img,fieldset{border:0;border-style:none}
+hr{height:0;box-sizing:content-box}
+[type="number"]::-webkit-outer-spin-button,[type="number"]::-webkit-inner-spin-button{height:auto}
+[type="radio"],[type="checkbox"],legend{box-sizing:border-box}
+legend{display:table}
+ul,ol,li{list-style:none}
+b,strong{font-weight:bold}
+button,html [type="button"],[type="submit"],[type="reset"]{-webkit-appearance:button}
+button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner{padding:0;border-style:none}
+[type="search"]{outline-offset: -2px;-webkit-appearance: textfield}
+[type="search"]::-webkit-search-cancel-button,[type="search"]::-webkit-search-decoration{-webkit-appearance:none}
+video,audio{display:inline-block}
+audio:not([controls]){height:0;display:none}
+abbr[title]{border:none;text-decoration:underline dotted}
+small{font-size:0.8em}
+sup,sub{font-size:0.75em}
+sup{top:-0.45em}
+sub{bottom:0.25em}
+img,input,select,a,progress{vertical-align:middle;background-color:#ffffff;}
+address{display:inline-block}
+
+
+/*===================================================================================================
+#	Reset Font    */
+html,body,div,p,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,button,input,label,select,textarea,fieldset,strong,article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section,a,address,legend{font-family:'돋움','dotum',sans-serif;font-size:1em;font-style:inherit;line-height:1.6em;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;-moz-text-size-adjust:none}
+select{font-family:'돋움','dotum','굴림','Gulim','sans-serif'}
+
+
+/*===================================================================================================
+#	Reset placeholder    */
+input::-moz-placeholder{color:#252525;opacity:1}
+input:-ms-input-placeholder{color:#252525}
+input::-webkit-input-placeholder{color:#252525}
+input:focus::-webkit-input-placeholder,textarea:focus::-webkit-input-placeholder{color:transparent}
+input:focus:-moz-placeholder,textarea:focus:-moz-placeholder{color:transparent}
+input:focus::-moz-placeholder,textarea:focus::-moz-placeholder{color:transparent}
+input:focus:-ms-input-placeholder,textarea:focus:-ms-input-placeholder{color:transparent}
+
+
+/*===================================================================================================
+#	Reset a Element    */
+a{text-decoration:none;background-color:transparent;-webkit-text-decoration-skip:objects}
+a:hover{color:#000000;text-decoration:underline}
