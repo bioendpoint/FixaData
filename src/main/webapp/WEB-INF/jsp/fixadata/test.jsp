@@ -100,7 +100,7 @@
 				<div class="contents">
 					<div class="content">
 						<ul class="text">
-							<li><span class="time">00:00</span><span class="message">이곳은 입력한 챗 내용이 표출 되는 부분 입니다.</span></li>
+							<li><span class="time">00:00</span><span class="message"> ===이곳은 입력한 챗 내용이 표출 되는 부분 입니다=== </span></li>
 						</ul>
 						<div class="input"><input name="CHATBOT_INPUT" type="text" value=""><a href="#" class="button">말풍선 버튼(입력 텍스트 전송)</a></div>
 					</div>
