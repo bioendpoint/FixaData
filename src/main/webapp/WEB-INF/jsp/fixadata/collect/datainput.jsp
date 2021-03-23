@@ -457,7 +457,7 @@ var frmType = "";
 <!-- 										<input type='hidden' name='r_receipt_no[]' value='receipt_no'/> -->
 									</td>
 									<td style="font-weight:500;">
-										<input type="text"  name="receipt_no" value=''>
+										<input type="text"  name="receipt_no" value=''>$$$test$$$
 									</td>
 								</tr>
 								<tr>
