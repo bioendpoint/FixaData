@@ -276,7 +276,7 @@ var frmType = "";
 	<div class="title">FixaData build by Tom.DongHyuk</div>
 	<div class="varsion">Ver. ${version_info}</div>
 </div>
-<div class="custom_titile"><font color="red">Outlier Ditection | Praud Detection | Data Quality | Data Cleansing</font></div>
+<div class="custom_titile"><font color="red">== Outlier Ditection | Praud Detection | Data Quality | Data Cleansing ==</font></div>
 
 <div class="macaddr">Mac address xxx : <span>${mac_address_info }</span></div>
 <ul class="top_btn_group">
