@@ -26,9 +26,9 @@
 	<div id="wrContents">
 
 		<ul id="arSheet"><!--
-			--><li class="item"><a href="#" class="on">데이터 전처리</a></li><!--
-			--><li class="item"><a href="#" class="lock">데이터 이상치 검출</a></li><!--
-			--><li class="item"><a href="#" class="lock">이상치 검출 결과</a></li><!--
+			--><li class="item"><a href="#" class="on">데이터 전처리(Data Preparation)</a></li><!--
+			--><li class="item"><a href="#" class="lock">데이터 이상치 검출(Data Outlier Detection)</a></li><!--
+			--><li class="item"><a href="#" class="lock">이상치 검출 결과(Data Detection Result)</a></li><!--
 		--></ul><!--// #arSheet -->
 
 		<div id="arContent">
