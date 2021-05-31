@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <jsp:include page="/fixadata-common/inc/head.jsp" />
 
@@ -23,6 +22,7 @@
       fill: none;
       stroke: steelblue;
       stroke-width: 1.5px;
+	}
 </style>
 </head>
 
