@@ -1,3 +1,67 @@
 Manifest-Version: 1.0
-Class-Path: 
+Class-Path: egovframework.rte.ptl.mvc-3.9.0.jar egovframework.rte.fdl.cm
+ mn-3.9.0.jar spring-context-support-4.3.22.RELEASE.jar spring-tx-4.3.22
+ .RELEASE.jar aspectjweaver-1.8.14.jar spring-webmvc-4.3.22.RELEASE.jar 
+ spring-modules-validation-0.9.jar commons-validator-1.4.0.jar commons-d
+ igester-1.8.jar snappy-java-1.1.7.5.jar json-path-2.4.0.jar json-smart-
+ 2.3.jar accessors-smart-1.2.jar slf4j-api-1.7.25.jar quartz-2.3.2.jar c
+ 3p0-0.9.5.4.jar mchange-commons-java-0.2.15.jar HikariCP-java7-2.4.13.j
+ ar cglib-3.2.10.jar asm-7.0.jar ant-1.10.3.jar ant-launcher-1.10.3.jar 
+ commons-compress-1.20.jar commons-io-2.6.jar egovframework.rte.psl.data
+ access-3.9.0.jar egovframework.rte.fdl.logging-3.9.0.jar log4j-core-2.1
+ 1.2.jar log4j-api-2.11.2.jar log4j-slf4j-impl-2.11.2.jar jcl-over-slf4j
+ -1.7.26.jar log4j-over-slf4j-1.7.26.jar spring-orm-4.3.22.RELEASE.jar j
+ avaee-api-7.0.jar javax.mail-1.5.0.jar activation-1.1.jar ibatis-sqlmap
+ -2.3.4.726.jar commons-collections-3.2.1.jar egovframework.rte.fdl.idgn
+ r-3.9.0.jar egovframework.rte.fdl.property-3.9.0.jar spring-web-4.3.22.
+ RELEASE.jar spring-jdbc-4.3.22.RELEASE.jar jsoup-1.13.1.jar spring-cont
+ ext-4.3.22.RELEASE.jar spring-aop-4.3.22.RELEASE.jar spring-beans-4.3.2
+ 2.RELEASE.jar spring-core-4.3.22.RELEASE.jar commons-logging-1.2.jar sp
+ ring-expression-4.3.22.RELEASE.jar exp4j-0.4.8.jar jstl-1.2.jar standar
+ d-1.1.2.jar antlr-3.5.jar antlr-runtime-3.5.jar stringtemplate-3.2.1.ja
+ r antlr-2.7.7.jar ST4-4.0.7.jar hsqldb-2.3.2.jar json-simple-1.1.jar co
+ mmons-dbcp-1.4.jar commons-pool-1.5.4.jar tomcat-dbcp-9.0.20.jar tomcat
+ -juli-9.0.20.jar commons-fileupload-1.3.3.jar commons-codec-1.2.jar jxl
+ -2.6.12.jar log4j-1.2.14.jar REngine-2.1.0.jar opencsv-4.3.jar commons-
+ lang3-3.8.jar commons-text-1.3.jar commons-beanutils-1.9.3.jar commons-
+ collections4-4.2.jar poi-3.7.jar poi-ooxml-3.7.jar poi-ooxml-schemas-3.
+ 7.jar xmlbeans-2.3.0.jar stax-api-1.0.1.jar geronimo-stax-api_1.0_spec-
+ 1.0.jar dom4j-1.6.1.jar xml-apis-1.0.b2.jar jri-0.8.8-osx.jar javax.ws.
+ rs-api-2.0.jar maven-assembly-plugin-3.1.1.jar maven-plugin-api-3.0.jar
+  maven-core-3.0.jar maven-settings-3.0.jar maven-settings-builder-3.0.j
+ ar maven-repository-metadata-3.0.jar maven-model-builder-3.0.jar maven-
+ aether-provider-3.0.jar aether-impl-1.7.jar aether-spi-1.7.jar aether-a
+ pi-1.7.jar aether-util-1.7.jar plexus-sec-dispatcher-1.3.jar plexus-cip
+ her-1.4.jar maven-artifact-3.0.jar maven-model-3.0.jar maven-common-art
+ ifact-filters-3.0.1.jar maven-shared-utils-3.1.0.jar maven-artifact-tra
+ nsfer-0.9.0.jar plexus-interpolation-1.25.jar plexus-archiver-4.0.0.jar
+  snappy-0.4.jar xz-1.8.jar file-management-3.0.0.jar maven-shared-io-3.
+ 0.0.jar maven-compat-3.0.jar wagon-provider-api-2.10.jar maven-filterin
+ g-3.1.1.jar plexus-build-api-0.0.7.jar plexus-io-3.1.1.jar maven-archiv
+ er-3.2.0.jar plexus-utils-3.1.0.jar sisu-inject-plexus-2.6.0.jar plexus
+ -component-annotations-1.5.5.jar plexus-classworlds-2.5.2.jar sisu-inje
+ ct-bean-2.6.0.jar cdi-api-1.0.jar jsr250-api-1.0.jar javax.inject-1.jar
+  sisu-guice-3.2.5-no_aop.jar guava-16.0.1.jar org.eclipse.sisu.inject-0
+ .3.0.jar org.eclipse.sisu.plexus-0.3.0.jar jackson-core-2.7.4.jar gson-
+ 2.8.5.jar jackson-databind-2.5.1.jar jackson-annotations-2.7.4.jar log4
+ jdbc-remix-0.2.4.jar easymock-2.5.2.jar slf4j-log4j12-1.6.1.jar jetty-s
+ erver-9.4.18.v20190429.jar jetty-http-9.4.18.v20190429.jar jetty-io-9.4
+ .18.v20190429.jar jetty-servlet-9.4.18.v20190429.jar jetty-security-9.4
+ .18.v20190429.jar apache-jsp-9.4.18.v20190429.jar jetty-util-9.4.18.v20
+ 190429.jar jetty-schemas-3.1.2.jar apache-jsp-8.5.40.jar apache-el-8.5.
+ 40.jar ecj-3.17.0.jar jetty-annotations-9.4.18.v20190429.jar javax.anno
+ tation-api-1.3.jar asm-commons-7.0.jar asm-tree-7.0.jar asm-analysis-7.
+ 0.jar jetty-webapp-9.4.18.v20190429.jar jetty-xml-9.4.18.v20190429.jar 
+ jetty-plus-9.4.18.v20190429.jar jetty-jndi-9.4.18.v20190429.jar jetty-t
+ est-helper-2.2.jar junit-dep-4.10.jar hamcrest-core-1.2.1.jar hamcrest-
+ library-1.2.1.jar univocity-parsers-2.8.2.jar unirest-java-1.4.9.jar ht
+ tpclient-4.5.2.jar httpcore-4.4.4.jar httpasyncclient-4.1.1.jar httpcor
+ e-nio-4.4.4.jar httpmime-4.5.2.jar json-20160212.jar postgresql-42.2.5.
+ jar commons-lang-2.6.jar mysql-connector-java-8.0.16.jar protobuf-java-
+ 3.6.1.jar mybatis-3.5.1.jar mybatis-spring-2.0.1.jar jackson-core-asl-1
+ .9.13.jar jackson-mapper-asl-1.9.13.jar jackson-xc-1.8.0.jar ojdbc6-11.
+ 2.0.3.jar jersey-client-3.0.0-M6.jar jakarta.ws.rs-api-3.0.0-M1.jar jer
+ sey-common-3.0.0-M6.jar jakarta.annotation-api-2.0.0-RC1.jar jakarta.ac
+ tivation-api-2.0.0-RC3.jar osgi-resource-locator-1.0.3.jar jakarta.acti
+ vation-2.0.0-RC3.jar jakarta.inject-api-2.0.0-RC4.jar
 

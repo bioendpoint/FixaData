@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="FixaData:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>FixaData</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="FixaData-1.3.0.war">
+      <element id="artifact" artifact-name="FixaData:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.rosuda:jri:0.8.8-osx">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/rosuda/jri/0.8.8-osx/jri-0.8.8-osx.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/rosuda/jri/0.8.8-osx/jri-0.8.8-osx-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/rosuda/jri/0.8.8-osx/jri-0.8.8-osx-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
